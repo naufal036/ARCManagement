@@ -24,6 +24,4 @@ Tugas: Fokus di pengelolaan file. Membuat fitur upload, download, dan pencarian 
 *5. Bagian Progres & Pelaporan*
 Tugas: Membuat tampilan untuk mencatat persentase progres harian/mingguan proyek, membuat tombol setuju/tolak dokumen untuk Direktur/Klien, dan menyatukan data-data tersebut ke dalam halaman cetak laporan akhir.
 
-kelen pilih mau yang mana bagiannya
-
 ---
