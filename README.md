@@ -1,4 +1,4 @@
-## 👥 Anggota Kelompok
+## Anggota Kelompok dan Pembagian Tugas
 
 * **Hadziq Naufal Sinaga** - (251402095)
 * **Aulia Syahfira** - (251402104)
