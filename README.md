@@ -17,14 +17,24 @@ Berikut adalah daftar anggota kelompok beserta fokus bagian yang dikerjakan:
 ### 1. Bagian Autentikasi, Hak Akses & Template Dasar
 Mengatur sistem Login/Register, membatasi hak akses (multi-role: Direktur, Admin, Pengawas, Staf), mencatat riwayat aktivitas, dan memasang template layout utama (navbar, sidebar, footer) yang bakal dipakai sama semua anggota lain.
 
+- `**Tabel yang dibuat:** Tabel users, roles, system_configs, dan activity_logs`
+
 ### 2. Bagian Master Data & Registrasi Proyek
 Membuat CRUD (tambah, lihat, edit, hapus) untuk data Klien, kategori Jenis Pekerjaan, dan Data Induk Proyek. Termasuk merancang form input proyek baru dan menampilkan daftarnya.
+
+- `**Tabel yang dibuat:** Tabel klien, jenis_pekerjaan, dan proyek.`
 
 ### 3. Bagian Kontrak & Penugasan Tim
 Membangun fitur untuk mengelola data Kontrak dan Adendum (perubahan kontrak), serta membuat halaman agar Admin bisa menugaskan staf/karyawan ke proyek tertentu beserta tenggat waktu pekerjaannya.
 
+- `**Tabel yang dibuat:** Tabel kontrak, adendum_kontrak, penugasan_proyek, dan tugas_proyek`
+
 ### 4. Bagian Manajemen & Arsip Dokumen
 Fokus di pengelolaan file. Membuat fitur upload, download, dan pencarian dokumen proyek, mengelompokkan kategori dokumen, serta mengelola pencatatan revisi kalau ada file yang diperbarui.
 
+- `**Tabel yang dibuat:** Tabel kategori_dokumen, dokumen_proyek, dan versi_dokumen`
+
 ### 5. Bagian Progres & Pelaporan
 Membuat tampilan untuk mencatat persentase progres harian/mingguan proyek, membuat tombol setuju/tolak dokumen untuk Direktur/Klien, dan menyatukan data-data tersebut ke dalam halaman cetak laporan akhir.
+
+- `Tabel yang dibuat: Tabel progres_proyek, review_dokumen, item_rab, dan laporan_proyek`
