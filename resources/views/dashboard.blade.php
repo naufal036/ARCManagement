@@ -1,4 +1,4 @@
-<x-app-layout>
+{{-- <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Dashboard') }}
@@ -14,4 +14,14 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-app-layout> --}}
+
+@extends('layouts.app')
+
+@section('header', 'Dashboard')
+
+@section('content')
+    <div class="bg-white p-6 rounded shadow">
+        <h3 class="text-lg font-medium">Selamat Datang di ARCManagement!</h3>
+    </div>
+@endsection

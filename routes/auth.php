@@ -33,11 +33,6 @@ Route::middleware('guest')->group(function () {
 
 // Blok untuk yang sudah login (auth)
 Route::middleware('auth')->group(function () {
-    // REGISTER DIPINDAHKAN KE SINI
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');
-
-    Route::post('register', [RegisteredUserController::class, 'store']);
 
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');

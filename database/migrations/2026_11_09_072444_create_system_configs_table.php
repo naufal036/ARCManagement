@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('system_configs', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_pengaturan');
-            $table->text('nilai')->nullable();
-
+            $table->string('config_key')->unique();
+            $table->text('config_value')->nullable();
+            $table->text('description')->nullable();
+            $table->foreignId('updated_by')->nullable()->constrained('users');
             $table->timestamps();
         });
     }
