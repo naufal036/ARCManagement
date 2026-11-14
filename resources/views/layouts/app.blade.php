@@ -9,28 +9,33 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+    <body class="font-inter antialiased">
+        <div
+            x-data="{ sidebarCollapsed: false, mobileNavOpen: false }"
+            @resize.window.debounce.100ms="if (window.innerWidth < 1024) sidebarCollapsed = false"
+            @keydown.escape.window="mobileNavOpen = false"
+            class="min-h-screen bg-[#F5F8FA] text-[#0F1B2D]"
+        >
             @include('layouts.navigation')
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+            <div class="app-main" :class="sidebarCollapsed ? 'app-main--collapsed' : ''">
+                @isset($header)
+                    <header class="border-b border-[#E3E8EF] bg-white">
+                        <div class="px-4 py-5 sm:px-6 lg:px-8">
+                            {{ $header }}
+                        </div>
+                    </header>
+                @endisset
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
+                <main class="pb-20 lg:pb-0">
+                    {{ $slot }}
+                </main>
+            </div>
         </div>
     </body>
 </html>
