@@ -20,10 +20,20 @@
                 ['label' => 'Kontrak', 'route' => 'contract.index', 'active' => 'contract.*', 'icon' => 'M6 3h9l3 3v15H6z M15 3v4h4 M9 12h6 M9 16h6'],
                 ['label' => 'Project Assignment', 'route' => 'project-assignment.index', 'active' => 'project-assignment.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M17 11h4 M19 9v4'],
                 ['label' => 'Progress Reporting', 'route' => 'progress-proyek.index', 'active' => 'progress-proyek.*', 'icon' => 'M3 3v18h18 M7 14l4-4 4 3 6-7'],
+            ],
+        ],
+        [
+            'label' => 'Document Management',
+            'items' => [
+                ['label' => 'Daftar Dokumen', 'route' => 'dokumen-proyek.index', 'active' => 'dokumen-proyek.*', 'icon' => 'M6 3h8l4 4v14H6z M14 3v5h5 M9 13h6 M9 17h6'],
                 ['label' => 'Laporan Dokumentasi', 'route' => 'laporan-dokumentasi.index', 'active' => 'laporan-dokumentasi.*', 'icon' => 'M4 4h16v16H4z M8 8h8 M8 12h5 M8 16h8'],
             ],
         ],
     ];
+
+    if (in_array(Auth::user()->role?->nama_role, ['Admin', 'Direktur'], true)) {
+        $navigationGroups[array_key_last($navigationGroups)]['items'][] = ['label' => 'Kategori Dokumen', 'route' => 'kategori-dokumen.index', 'active' => 'kategori-dokumen.*', 'icon' => 'M4 5h16v14H4z M8 9h8 M8 13h5'];
+    }
 @endphp
 
 <div

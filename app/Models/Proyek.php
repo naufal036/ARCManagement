@@ -38,4 +38,9 @@ class Proyek extends Model
     {
         return $this->hasMany(ProgressProyek::class, 'proyek_id');
     }
+
+    public function dokumenProyek(): HasMany
+    {
+        return $this->hasMany(DokumenProyek::class, 'proyek_id');
+    }
 }
