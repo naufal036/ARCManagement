@@ -1,4 +1,3 @@
-
 <?php
 
 use App\Http\Controllers\JenisPekerjaanController;
@@ -9,6 +8,7 @@ use App\Http\Controllers\SystemConfigController;
 use App\Http\Controllers\ProyekController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\ProjectAssignmentController;
+use App\Http\Controllers\ProgressProyekController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -37,6 +37,10 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('contract', ContractController::class);
     Route::resource('project-assignment', ProjectAssignmentController::class);
+
+    // PREVIEW SEMENTARA - HANYA UNTUK DEVELOPMENT - ONGOING
+    Route::resource('progress-proyek', ProgressProyekController::class)
+        ->only(['index', 'create', 'store', 'show']);
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
