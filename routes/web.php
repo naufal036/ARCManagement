@@ -7,10 +7,12 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProyekController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\ProjectAssignmentController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\SystemConfigController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 Route::get('/dashboard', function () {
@@ -28,6 +30,14 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('contract', ContractController::class);
     Route::resource('project-assignment', ProjectAssignmentController::class);
+
+    Route::middleware(['auth', 'role:Admin'])->group(function () {
+        Route::resource('users', UserController::class);
+
+        // Tambahkan baris ini
+        Route::get('/settings', [SystemConfigController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [SystemConfigController::class, 'update'])->name('settings.update');
+    });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
