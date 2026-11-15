@@ -9,16 +9,35 @@
     <link rel="icon" type="image/png" href="{{ asset('images/logo1.png') }}">
 </head>
 
-<body class="bg-gray-100 min-h-screen flex flex-col font-sans text-gray-900">
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
 
-    <!-- Top Navbar Full-Width -->
-    <header class="bg-slate-900 text-white shadow-md px-6 py-3 flex items-center justify-between z-30">
-        <!-- Kiri: Logo & Nama Web -->
-        <div class="flex-1 flex items-center gap-3">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-9 h-9 object-contain">
-            <h1 class="text-xl font-bold tracking-wider">
-                {{ \App\Models\SystemConfig::where('config_key', 'app_name')->value('config_value') ?? 'ARC Management' }}
-            </h1>
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    </head>
+    <body class="font-inter antialiased">
+        <div
+            x-data="{ sidebarCollapsed: false, mobileNavOpen: false }"
+            @resize.window.debounce.100ms="if (window.innerWidth < 1024) sidebarCollapsed = false"
+            @keydown.escape.window="mobileNavOpen = false"
+            class="min-h-screen bg-[#F5F8FA] text-[#0F1B2D]"
+        >
+            @include('layouts.navigation')
+
+            <div class="app-main" :class="sidebarCollapsed ? 'app-main--collapsed' : ''">
+                @isset($header)
+                    <header class="border-b border-[#E3E8EF] bg-white">
+                        <div class="px-4 py-5 sm:px-6 lg:px-8">
+                            {{ $header }}
+                        </div>
+                    </header>
+                @endisset
+
+                <main class="pb-20 lg:pb-0">
+                    {{ $slot }}
+                </main>
+            </div>
         </div>
 
         <!-- Tengah: Jam & Tanggal Real-time -->
