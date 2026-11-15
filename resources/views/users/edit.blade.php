@@ -88,7 +88,7 @@
                     <div class="space-y-1.5">
                         <h4 class="text-lg font-bold text-gray-900 uppercase">{{ $user->name }}</h4>
                         <p class="text-sm text-gray-600">Role: <span
-                                class="font-medium text-gray-800">{{ $user->role->name ?? 'Pengguna' }}</span></p>
+                                class="font-medium text-gray-800">{{ $user->role?->name ?? 'Pengguna' }}</span></p>
                         <p class="text-sm text-gray-600">Email: <span class="text-gray-800">{{ $user->email }}</span></p>
                         <p class="text-sm text-gray-600">Telepon: <span
                                 class="text-gray-800">{{ $user->phone ?? '-' }}</span></p>

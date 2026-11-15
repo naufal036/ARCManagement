@@ -43,8 +43,6 @@
                             {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 2)) }}
                         </div>
                     @endif
-                        </div>
-                    @endif
 
                     <!-- Baris Atas: Nama Pengguna | Baris Bawah: Role -->
                     <div class="text-left leading-tight">
@@ -52,7 +50,7 @@
                             {{ Auth::user()->name ?? 'User' }}
                         </p>
                         <p class="text-xs text-gray-500">
-                            {{ Auth::user()->role->name ?? 'Pengguna' }}
+                            {{ Auth::user()->role?->name ?? 'Pengguna' }}
                         </p>
                     </div>
                 </button>
