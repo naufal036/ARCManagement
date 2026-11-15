@@ -1,3 +1,4 @@
+
 @php
     $navigationGroups = [
         [
@@ -73,13 +74,14 @@
                 <div class="space-y-1">
                     @foreach ($group['items'] as $item)
                         @php
-                            $isActive = isset($item['route']) && request()->routeIs($item['active']);
+                            $hasRoute = isset($item['route']) && \Illuminate\Support\Facades\Route::has($item['route']);
+                            $isActive = $hasRoute && request()->routeIs($item['active']);
                             $itemClasses = $isActive
                                 ? 'border-s-2 border-[#14B8A6] bg-white/10 text-white'
                                 : 'border-s-2 border-transparent text-slate-300 hover:bg-white/5 hover:text-white';
                         @endphp
 
-                        @if (isset($item['route']))
+                        @if ($hasRoute)
                             <a
                                 href="{{ route($item['route']) }}"
                                 @if ($isActive) aria-current="page" @endif
@@ -99,7 +101,7 @@
                                     <path d="{{ $item['icon'] }}" />
                                 </svg>
                                 <span x-show="!sidebarCollapsed" x-cloak class="truncate">{{ $item['label'] }}</span>
-                        @if (isset($item['route']))
+                        @if ($hasRoute)
                             </a>
                         @else
                             </span>
@@ -241,16 +243,33 @@
         ['label' => 'Klien', 'route' => 'klien.index', 'active' => 'klien.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M20 8v6 M23 11h-6'],
         ['label' => 'Data Master', 'route' => 'jenis-pekerjaan.index', 'active' => 'jenis-pekerjaan.*', 'icon' => 'M4 4h16v16H4z M8 8h8 M8 12h8 M8 16h5'],
     ] as $item)
-        @php($isActive = request()->routeIs($item['active']))
-        <a
-            href="{{ route($item['route']) }}"
-            @if ($isActive) aria-current="page" @endif
-            class="flex min-h-16 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium transition-colors {{ $isActive ? 'text-[#0A2342]' : 'text-[#5B6B80] hover:text-[#0A2342]' }}"
-        >
+        @php
+            $hasRoute = \Illuminate\Support\Facades\Route::has($item['route']);
+            $isActive = $hasRoute && request()->routeIs($item['active']);
+        @endphp
+
+        @if ($hasRoute)
+            <a
+                href="{{ route($item['route']) }}"
+                @if ($isActive) aria-current="page" @endif
+                class="flex min-h-16 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium transition-colors {{ $isActive ? 'text-[#0A2342]' : 'text-[#5B6B80] hover:text-[#0A2342]' }}"
+            >
+        @else
+            <span
+                aria-disabled="true"
+                title="{{ $item['label'] }} — belum tersedia"
+                class="flex min-h-16 cursor-not-allowed flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium text-slate-400"
+            >
+        @endif
             <svg class="h-5 w-5 {{ $isActive ? 'text-[#14B8A6]' : '' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="{{ $item['icon'] }}" />
             </svg>
             <span>{{ $item['label'] }}</span>
-        </a>
+
+        @if ($hasRoute)
+            </a>
+        @else
+            </span>
+        @endif
     @endforeach
 </nav>
