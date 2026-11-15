@@ -6,7 +6,7 @@
             'items' => [
                 ['label' => 'Dashboard', 'route' => 'dashboard', 'active' => 'dashboard', 'icon' => 'M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z'],
                 ['label' => 'Proyek', 'route' => 'proyek.index', 'active' => 'proyek.*', 'icon' => 'M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
-                ['label' => 'Dokumen', 'icon' => 'M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z M14 3v5h5 M9 13h6 M9 17h6'],
+                ['label' => 'Dokumen', 'route' => 'dokumen-proyek.index', 'active' => 'dokumen-proyek.*', 'icon' => 'M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z M14 3v5h5 M9 13h6 M9 17h6'],
                 ['label' => 'Progres', 'icon' => 'M3 3v18h18 M7 14l4-4 4 3 6-7'],
                 ['label' => 'Laporan', 'icon' => 'M4 19V5 M4 19h17 M8 16v-5 M13 16V7 M18 16V9'],
                 ['label' => 'Klien', 'route' => 'klien.index', 'active' => 'klien.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M20 8v6 M23 11h-6'],
@@ -26,6 +26,7 @@
             'label' => 'Data Master',
             'items' => [
                 ['label' => 'Jenis Pekerjaan', 'route' => 'jenis-pekerjaan.index', 'active' => 'jenis-pekerjaan.*', 'icon' => 'M4 4h16v16H4z M8 8h8 M8 12h8 M8 16h5'],
+                ['label' => 'Kategori Dokumen', 'route' => 'kategori-dokumen.index', 'active' => 'kategori-dokumen.*', 'icon' => 'M3 5h18v14H3z M7 9h10 M7 13h10'],
             ],
         ],
     ];

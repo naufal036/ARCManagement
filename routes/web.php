@@ -9,6 +9,9 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\ProjectAssignmentController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SystemConfigController;
+use App\Http\Controllers\DokumenProyekController;
+use App\Http\Controllers\KategoriDokumenController;
+use App\Http\Controllers\VersiDokumenController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -38,6 +41,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/settings', [SystemConfigController::class, 'index'])->name('settings.index');
         Route::post('/settings', [SystemConfigController::class, 'update'])->name('settings.update');
     });
+
+    Route::resource('kategori-dokumen', KategoriDokumenController::class)
+    ->except(['show'])
+    ->parameters(['kategori-dokumen' => 'kategoriDokumen']);
+
+    Route::resource('dokumen-proyek', DokumenProyekController::class);
+    Route::post('dokumen-proyek/{dokumenProyek}/versi', [VersiDokumenController::class, 'store'])
+        ->name('dokumen-proyek.versi.store');
+    Route::get('versi-dokumen/{versiDokumen}/unduh', [VersiDokumenController::class, 'download'])
+        ->name('versi-dokumen.download');
 });
 
 require __DIR__ . '/auth.php';
