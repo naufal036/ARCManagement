@@ -12,6 +12,7 @@ use App\Http\Controllers\SystemConfigController;
 use App\Http\Controllers\DokumenProyekController;
 use App\Http\Controllers\KategoriDokumenController;
 use App\Http\Controllers\VersiDokumenController;
+use App\Http\Controllers\ProgressProyekController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -34,23 +35,28 @@ Route::middleware('auth')->group(function () {
     Route::resource('contract', ContractController::class);
     Route::resource('project-assignment', ProjectAssignmentController::class);
 
-    Route::middleware(['auth', 'role:Admin'])->group(function () {
+    Route::middleware(['role:Admin'])->group(function () {
         Route::resource('users', UserController::class);
 
-        // Tambahkan baris ini
         Route::get('/settings', [SystemConfigController::class, 'index'])->name('settings.index');
         Route::post('/settings', [SystemConfigController::class, 'update'])->name('settings.update');
     });
 
     Route::resource('kategori-dokumen', KategoriDokumenController::class)
-    ->except(['show'])
-    ->parameters(['kategori-dokumen' => 'kategoriDokumen']);
+        ->except(['show'])
+        ->parameters(['kategori-dokumen' => 'kategoriDokumen']);
 
     Route::resource('dokumen-proyek', DokumenProyekController::class);
+
     Route::post('dokumen-proyek/{dokumenProyek}/versi', [VersiDokumenController::class, 'store'])
         ->name('dokumen-proyek.versi.store');
+
     Route::get('versi-dokumen/{versiDokumen}/unduh', [VersiDokumenController::class, 'download'])
         ->name('versi-dokumen.download');
+
+    // Progress Proyek
+    Route::resource('progress-proyek', ProgressProyekController::class)
+        ->only(['index', 'create', 'store', 'show']);
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
