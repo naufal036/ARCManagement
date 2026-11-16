@@ -50,6 +50,13 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // --- TAMBAHAN KODE CEK STATUS ---
+        if (Auth::user()->status === 'inactive') {
+            Auth::logout(); // Logout paksa user tersebut
+            // Lempar ke halaman blank dengan pesan error 403
+            abort(403, 'Akun Anda telah dinonaktifkan. Silakan hubungi Administrator.');
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

@@ -27,6 +27,11 @@ class JenisPekerjaanController extends Controller
         return view('jenis-pekerjaan.create');
     }
 
+    public function show(JenisPekerjaan $jenisPekerjaan): View
+    {
+        return view('jenis-pekerjaan.show', compact('jenisPekerjaan'));
+    }
+
     /**
      * Store a newly created resource in storage.
      */

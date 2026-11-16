@@ -3,28 +3,50 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        $roleAdmin = \App\Models\Role::create(['nama_role' => 'Admin']);
-        \App\Models\Role::create(['nama_role' => 'Direktur']);
-        \App\Models\Role::create(['nama_role' => 'Pengawas Lapangan']);
-        \App\Models\Role::create(['nama_role' => 'Staf Teknis']);
-
-        \App\Models\User::create([
+        // 1. Buat role Admin utama
+        $adminRoleId = DB::table('roles')->insertGetId([
             'name' => 'Admin',
+            'description' => 'Administrator Sistem',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // 2. Buat role lainnya agar langsung tersedia di dropdown
+        DB::table('roles')->insert([
+            [
+                'name' => 'Manajer',
+                'description' => 'Manajer Proyek',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Karyawan',
+                'description' => 'Staf Proyek',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        // 3. Buat akun Admin utama
+        User::create([
+            'name' => 'Administrator',
             'email' => 'admin@gmail.com',
-            'password' => bcrypt('admin123'),
-            'role_id' => $roleAdmin->id,
+            'password' => Hash::make('admin123'),
+            'role_id' => $adminRoleId,
+            'phone' => '081234567890',
+            'status' => 'active',
+            'email_verified_at' => now(),
         ]);
     }
 }

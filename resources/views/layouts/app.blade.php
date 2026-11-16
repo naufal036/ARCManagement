@@ -30,10 +30,22 @@
                             {{ $header }}
                         </div>
                     </header>
+                @else
+                    @hasSection('header')
+                        <header class="border-b border-[#E3E8EF] bg-white">
+                            <div class="px-4 py-5 sm:px-6 lg:px-8">
+                                @yield('header')
+                            </div>
+                        </header>
+                    @endif
                 @endisset
 
                 <main class="pb-20 lg:pb-0">
-                    {{ $slot }}
+                    @isset($slot)
+                        {{ $slot }}
+                    @else
+                        @yield('content')
+                    @endisset
                 </main>
             </div>
         </div>
