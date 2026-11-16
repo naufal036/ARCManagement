@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\ProyekFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +11,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Proyek extends Model
 {
     protected $table = 'proyek';
+
+    /** @use HasFactory<ProyekFactory> */
+    use HasFactory;
 
     protected $fillable = [
         'kode_proyek',
