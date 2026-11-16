@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Contract extends Model
 {
     use HasFactory;
+
+    protected $table = 'contracts';
 
     protected $fillable = [
         'project_id',
@@ -18,6 +22,8 @@ class Contract extends Model
         'end_date',
         'contract_value',
         'status',
+        'file_path',
+        'file_name',
     ];
 
     protected function casts(): array
@@ -30,12 +36,12 @@ class Contract extends Model
         ];
     }
 
-    public function proyek()
+    public function proyek(): BelongsTo
     {
         return $this->belongsTo(Proyek::class, 'project_id');
     }
 
-    public function contractAddendums()
+    public function contractAddendums(): HasMany
     {
         return $this->hasMany(ContractAddendum::class);
     }
