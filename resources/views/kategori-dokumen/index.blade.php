@@ -1,74 +1,44 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800">{{ __('Kategori Dokumen') }}</h2>
+        <div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <p class="text-sm font-medium text-[#2A6F97]">Pengaturan DMS</p>
+                <h2 class="text-2xl font-bold tracking-tight text-[#0A2342]">Kategori Dokumen</h2>
+            </div>
+            <a href="{{ route('kategori-dokumen.create') }}" class="rounded-xl bg-[#0A2342] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#123B63]">+ Tambah Kategori</a>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-            @if (session('status'))
-                <div class="border-s-4 border-indigo-500 bg-indigo-50 p-4 text-sm text-indigo-700">
-                    @switch(session('status'))
-                        @case('kategori-dokumen-created')
-                            {{ __('Kategori dokumen berhasil ditambahkan.') }}
-                            @break
-                        @case('kategori-dokumen-updated')
-                            {{ __('Kategori dokumen berhasil diperbarui.') }}
-                            @break
-                        @case('kategori-dokumen-deleted')
-                            {{ __('Kategori dokumen berhasil dihapus.') }}
-                            @break
-                        @case('kategori-dokumen-in-use')
-                            {{ __('Kategori tidak dapat dihapus karena masih digunakan oleh dokumen.') }}
-                            @break
-                    @endswitch
-                </div>
-            @endif
-
-            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                <h3 class="text-lg font-medium text-gray-900">{{ __('Daftar Kategori Dokumen') }}</h3>
-                <a href="{{ route('kategori-dokumen.create') }}" class="rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-gray-700">
-                    {{ __('Tambah Kategori') }}
-                </a>
-            </div>
-
-            <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
-                <div class="overflow-x-auto px-4 py-5 sm:px-6">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('Nama Kategori') }}</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('Deskripsi') }}</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('Jumlah Dokumen') }}</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">{{ __('Aksi') }}</th>
+    <div class="space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+        @if (session('success')) <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{{ session('success') }}</div> @endif
+        @if (session('error')) <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ session('error') }}</div> @endif
+        <section class="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_24px_rgba(15,27,45,0.05)]">
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[640px] text-left text-sm">
+                    <thead class="bg-[#F8FAFC] text-xs uppercase tracking-wide text-[#5B6B80]">
+                        <tr><th class="px-6 py-3">Kategori</th><th class="px-6 py-3">Deskripsi</th><th class="px-6 py-3">Jumlah dokumen</th><th class="px-6 py-3 text-right">Aksi</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#E3E8EF]">
+                        @forelse ($kategoriDokumen as $kategori)
+                            <tr class="hover:bg-[#F8FAFC]">
+                                <td class="px-6 py-4 font-semibold text-[#0F1B2D]">{{ $kategori->nama_kategori }}</td>
+                                <td class="px-6 py-4 text-[#5B6B80]">{{ $kategori->deskripsi ?: '-' }}</td>
+                                <td class="px-6 py-4 text-[#5B6B80]">{{ $kategori->dokumen_proyek_count }}</td>
+                                <td class="whitespace-nowrap px-6 py-4 text-right">
+                                    <a href="{{ route('kategori-dokumen.edit', $kategori) }}" class="font-semibold text-[#2A6F97]">Edit</a>
+                                    <form method="POST" action="{{ route('kategori-dokumen.destroy', $kategori) }}" class="ml-3 inline" onsubmit="return confirm('Hapus kategori ini?');">
+                                        @csrf @method('DELETE')
+                                        <button class="font-semibold text-red-600">Hapus</button>
+                                    </form>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 bg-white">
-                            @forelse ($kategoriDokumen as $item)
-                                <tr>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ $item->nama_kategori }}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-500">{{ $item->deskripsi ?: '-' }}</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ $item->dokumen_proyek_count }}</td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                                        <a href="{{ route('kategori-dokumen.edit', $item) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('Edit') }}</a>
-                                        <form action="{{ route('kategori-dokumen.destroy', $item) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="ml-3 text-red-600 hover:text-red-900" onclick="return confirm('{{ __('Hapus kategori ini?') }}')">
-                                                {{ __('Hapus') }}
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">{{ __('Belum ada kategori dokumen.') }}</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                {{ $kategoriDokumen->links() }}
+                        @empty
+                            <tr><td colspan="4" class="px-6 py-12 text-center text-[#5B6B80]">Belum ada kategori dokumen.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-        </div>
+            <div class="border-t border-[#E3E8EF] px-6 py-4">{{ $kategoriDokumen->links() }}</div>
+        </section>
     </div>
 </x-app-layout>

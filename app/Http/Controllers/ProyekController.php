@@ -32,6 +32,17 @@ class ProyekController extends Controller
         ]);
     }
 
+    public function show(Proyek $proyek): View
+    {
+        return view('proyek.show', [
+            'proyek' => $proyek->load([
+                'klien',
+                'jenisPekerjaan',
+                'progressProyek' => fn ($query) => $query->latest('tanggal_laporan'),
+            ]),
+        ]);
+    }
+
     /**
      * Store a newly created resource in storage.
      */

@@ -32,11 +32,11 @@
     }
 
     .app-sidebar {
-        width: 240px;
+        width: 250px;
     }
 
     .app-topbar {
-        margin-inline-start: 240px;
+        margin-inline-start: 250px;
         transition: margin-inline-start 200ms ease;
     }
 
@@ -46,7 +46,7 @@
 
     .app-main {
         min-height: 100vh;
-        margin-inline-start: 240px;
+        margin-inline-start: 250px;
         transition: margin-inline-start 200ms ease;
     }
 

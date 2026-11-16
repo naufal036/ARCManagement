@@ -26,14 +26,19 @@
                             Proyek
                         </label>
 
-                        <select disabled
-                            class="w-full border-gray-300 rounded-lg bg-gray-100">
-                            <option>Menunggu integrasi tabel proyek</option>
+                        <select name="proyek_id"
+                            class="w-full border-gray-300 rounded-lg" required>
+                            <option value="">Pilih proyek</option>
+                            @foreach ($proyeks as $proyek)
+                                <option value="{{ $proyek->id }}" @selected(old('proyek_id') == $proyek->id)>
+                                    {{ $proyek->kode_proyek }} - {{ $proyek->nama_proyek }}
+                                </option>
+                            @endforeach
                         </select>
 
-                        <p class="text-xs text-gray-500 mt-1">
-                            Pilihan proyek akan diaktifkan setelah integrasi.
-                        </p>
+                        @error('proyek_id')
+                            <p class="text-red-600 text-sm">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <!-- Tanggal Laporan -->

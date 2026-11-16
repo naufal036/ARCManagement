@@ -2,22 +2,20 @@
 
 namespace App\Models;
 
-use Database\Factories\KategoriDokumenFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class KategoriDokumen extends Model
 {
+    use HasFactory;
+
     protected $table = 'kategori_dokumen';
 
     protected $fillable = [
         'nama_kategori',
         'deskripsi',
     ];
-
-    /** @use HasFactory<KategoriDokumenFactory> */
-    use HasFactory;
 
     public function dokumenProyek(): HasMany
     {

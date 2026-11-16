@@ -1,63 +1,11 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800">{{ __('Tambah Dokumen Proyek') }}</h2>
-    </x-slot>
-
-    <div class="py-12">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div class="rounded-lg border border-gray-200 bg-white p-4 shadow sm:p-8">
-                @if ($proyek->isEmpty() || $kategoriDokumen->isEmpty())
-                    <div class="mb-6 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-                        @if ($proyek->isEmpty())
-                            {{ __('Tambahkan proyek terlebih dahulu.') }}
-                        @endif
-                        @if ($kategoriDokumen->isEmpty())
-                            <a href="{{ route('kategori-dokumen.create') }}" class="font-semibold underline">{{ __('Buat kategori dokumen') }}</a>
-                            {{ __('sebelum mendaftarkan dokumen.') }}
-                        @endif
-                    </div>
-                @endif
-
-                <form action="{{ route('dokumen-proyek.store') }}" method="POST" class="space-y-6">
-                    @csrf
-                    <div>
-                        <x-input-label for="nama_dokumen" value="{{ __('Nama Dokumen') }}" />
-                        <x-text-input id="nama_dokumen" name="nama_dokumen" type="text" class="mt-1 block w-full" :value="old('nama_dokumen')" required autofocus />
-                        <x-input-error :messages="$errors->get('nama_dokumen')" class="mt-2" />
-                    </div>
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <div>
-                            <x-input-label for="proyek_id" value="{{ __('Proyek') }}" />
-                            <select id="proyek_id" name="proyek_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="">{{ __('Pilih Proyek') }}</option>
-                                @foreach ($proyek as $item)
-                                    <option value="{{ $item->id }}" @selected(old('proyek_id') == $item->id)>{{ $item->nama_proyek }} ({{ $item->kode_proyek }})</option>
-                                @endforeach
-                            </select>
-                            <x-input-error :messages="$errors->get('proyek_id')" class="mt-2" />
-                        </div>
-                        <div>
-                            <x-input-label for="kategori_dokumen_id" value="{{ __('Kategori Dokumen') }}" />
-                            <select id="kategori_dokumen_id" name="kategori_dokumen_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="">{{ __('Pilih Kategori') }}</option>
-                                @foreach ($kategoriDokumen as $item)
-                                    <option value="{{ $item->id }}" @selected(old('kategori_dokumen_id') == $item->id)>{{ $item->nama_kategori }}</option>
-                                @endforeach
-                            </select>
-                            <x-input-error :messages="$errors->get('kategori_dokumen_id')" class="mt-2" />
-                        </div>
-                    </div>
-                    <div>
-                        <x-input-label for="deskripsi" value="{{ __('Deskripsi') }}" />
-                        <textarea id="deskripsi" name="deskripsi" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">{{ old('deskripsi') }}</textarea>
-                        <x-input-error :messages="$errors->get('deskripsi')" class="mt-2" />
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <x-primary-button :disabled="$proyek->isEmpty() || $kategoriDokumen->isEmpty()">{{ __('Simpan Dokumen') }}</x-primary-button>
-                        <a href="{{ route('dokumen-proyek.index') }}" class="text-sm text-gray-600 hover:text-gray-900">{{ __('Kembali') }}</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    <x-slot name="header"><h2 class="text-2xl font-bold tracking-tight text-[#0A2342]">Tambah Dokumen Proyek</h2></x-slot>
+    <div class="px-4 py-8 sm:px-6 lg:px-8"><form method="POST" action="{{ route('dokumen-proyek.store') }}" class="mx-auto max-w-3xl space-y-5 rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_24px_rgba(15,27,45,0.05)]">@csrf
+        <div><label for="nama_dokumen" class="block text-sm font-semibold text-[#0F1B2D]">Nama dokumen</label><input id="nama_dokumen" name="nama_dokumen" value="{{ old('nama_dokumen') }}" required class="mt-1 w-full rounded-xl border-[#D7E0EA]">@error('nama_dokumen')<p class="text-sm text-red-600">{{ $message }}</p>@enderror</div>
+        <div class="grid gap-5 sm:grid-cols-2"><div><label for="proyek_id" class="block text-sm font-semibold text-[#0F1B2D]">Proyek</label><select id="proyek_id" name="proyek_id" required class="mt-1 w-full rounded-xl border-[#D7E0EA]"><option value="">Pilih proyek</option>@foreach($proyeks as $proyek)<option value="{{ $proyek->id }}" @selected(old('proyek_id') == $proyek->id)>{{ $proyek->nama_proyek }}</option>@endforeach</select></div><div><label for="kategori_dokumen_id" class="block text-sm font-semibold text-[#0F1B2D]">Kategori</label><select id="kategori_dokumen_id" name="kategori_dokumen_id" required class="mt-1 w-full rounded-xl border-[#D7E0EA]"><option value="">Pilih kategori</option>@foreach($kategoriDokumen as $kategori)<option value="{{ $kategori->id }}" @selected(old('kategori_dokumen_id') == $kategori->id)>{{ $kategori->nama_kategori }}</option>@endforeach</select></div></div>
+        <div><label for="deskripsi" class="block text-sm font-semibold text-[#0F1B2D]">Deskripsi</label><textarea id="deskripsi" name="deskripsi" rows="4" class="mt-1 w-full rounded-xl border-[#D7E0EA]">{{ old('deskripsi') }}</textarea></div>
+        <div><label for="progress_proyek_id" class="block text-sm font-semibold text-[#0F1B2D]">Relasi laporan progress <span class="font-normal text-[#8A97A8]">(opsional)</span></label><select id="progress_proyek_id" name="progress_proyek_id" class="mt-1 w-full rounded-xl border-[#D7E0EA]"><option value="">Tidak dikaitkan</option>@foreach($progressProyek as $progress)<option value="{{ $progress->id }}" @selected(old('progress_proyek_id') == $progress->id)>{{ $progress->proyek?->nama_proyek }} · {{ $progress->tanggal_laporan?->format('d M Y') }} · {{ $progress->persentase_progress }}%</option>@endforeach</select></div>
+        <div class="rounded-xl border border-[#BFE8E2] bg-[#E6F4F3] px-4 py-3 text-sm text-[#0F766E]">Setelah metadata tersimpan, unggah beberapa file versi sekaligus dari halaman detail dokumen. Maksimal 20 file per batch, 50 MB per file, dan total 100 MB.</div>
+        <div class="flex gap-3"><button class="rounded-xl bg-[#0A2342] px-4 py-2.5 text-sm font-semibold text-white">Simpan Dokumen</button><a href="{{ route('dokumen-proyek.index') }}" class="rounded-xl border border-[#D7E0EA] px-4 py-2.5 text-sm font-semibold text-[#5B6B80]">Batal</a></div>
+    </form></div>
 </x-app-layout>
