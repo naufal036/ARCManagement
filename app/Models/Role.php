@@ -7,15 +7,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Role extends Model
 {
-    // Daftarkan kolom yang boleh diisi
     protected $fillable = [
         'name',
         'description',
+        'nama_role',
     ];
 
-    // Opsional: tambahkan relasi balik ke User jika nanti diperlukan
-    public function users()
+    public function setNamaRoleAttribute(?string $value): void
     {
-        return $this->hasMany(User::class);
+        $this->attributes['name'] = $value;
+    }
+
+    public function getNamaRoleAttribute(): ?string
+    {
+        return $this->attributes['name'] ?? null;
+    }
+
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class, 'role_id');
     }
 }
