@@ -1,4 +1,3 @@
-
 @php
     $navigationGroups = [
         [
@@ -6,8 +5,10 @@
             'items' => [
                 ['label' => 'Dashboard', 'route' => 'dashboard', 'active' => 'dashboard', 'icon' => 'M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z'],
                 ['label' => 'Proyek', 'route' => 'proyek.index', 'active' => 'proyek.*', 'icon' => 'M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
+                ['label' => 'Kontrak', 'route' => 'contract.index', 'active' => 'contract.*', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z'],
+                ['label' => 'Penugasan', 'route' => 'project-assignment.index', 'active' => 'project-assignment.*', 'icon' => 'M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2m-6 9 2 2 4-4'],
                 ['label' => 'Dokumen', 'icon' => 'M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z M14 3v5h5 M9 13h6 M9 17h6'],
-                ['label' => 'Progres', 'icon' => 'M3 3v18h18 M7 14l4-4 4 3 6-7'],
+                ['label' => 'Progres', 'route' => 'progress-proyek.index', 'active' => 'progress-proyek.*', 'icon' => 'M3 3v18h18 M7 14l4-4 4 3 6-7'],
                 ['label' => 'Laporan', 'icon' => 'M4 19V5 M4 19h17 M8 16v-5 M13 16V7 M18 16V9'],
                 ['label' => 'Klien', 'route' => 'klien.index', 'active' => 'klien.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M20 8v6 M23 11h-6'],
                 ['label' => 'Konsultasi', 'icon' => 'M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z'],
@@ -19,7 +20,6 @@
             'items' => [
                 ['label' => 'Anggaran', 'icon' => 'M3 6h18v13H3z M3 10h18 M7 15h3'],
                 ['label' => 'Tim', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M20 8v6 M23 11h-6'],
-                ['label' => 'Pengaturan', 'icon' => 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.6 2.8-.2-.1a1.7 1.7 0 0 0-1.8.2l-.2.1h-3.2l-.1-.2a1.7 1.7 0 0 0-1.5-1l-.2-.1-1.6-2.8.1-.2a1.7 1.7 0 0 0-.3-1.8l-.1-.2v-3.2l.2-.1a1.7 1.7 0 0 0 1-1.5l.1-.2 2.8-1.6.2.1a1.7 1.7 0 0 0 1.8-.3l.2-.1h3.2l.1.2a1.7 1.7 0 0 0 1.5 1l.2.1 1.6 2.8-.1.2a1.7 1.7 0 0 0 .3 1.8l.1.2v3.2l-.2.1a1.7 1.7 0 0 0-1 1.5z'],
             ],
         ],
         [
@@ -29,6 +29,16 @@
             ],
         ],
     ];
+
+    if (Auth::user()->role && Auth::user()->role->name === 'Admin') {
+        $navigationGroups[] = [
+            'label' => 'Administrasi',
+            'items' => [
+                ['label' => 'Manajemen Pengguna', 'route' => 'users.index', 'active' => 'users.*', 'icon' => 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M23 21v-2a4 4 0 0 0-3-3.87 M16 3.13a4 4 0 0 1 0 7.75'],
+                ['label' => 'Pengaturan Sistem', 'route' => 'settings.index', 'active' => 'settings.*', 'icon' => 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.6 2.8-.2-.1a1.7 1.7 0 0 0-1.8.2l-.2.1h-3.2l-.1-.2a1.7 1.7 0 0 0-1.5-1l-.2-.1-1.6-2.8.1-.2a1.7 1.7 0 0 0-.3-1.8l-.1-.2v-3.2l.2-.1a1.7 1.7 0 0 0 1-1.5l.1-.2 2.8-1.6.2.1a1.7 1.7 0 0 0 1.8-.3l.2-.1h3.2l.1.2a1.7 1.7 0 0 0 1.5 1l.2.1 1.6 2.8-.1.2a1.7 1.7 0 0 0 .3 1.8l.1.2v3.2l-.2.1a1.7 1.7 0 0 0-1 1.5z'],
+            ],
+        ];
+    }
 @endphp
 
 <div
@@ -49,7 +59,9 @@
         <a href="{{ route('dashboard') }}" class="flex min-w-0 items-center gap-3" aria-label="ARC Management — Dashboard">
             <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#14B8A6] text-sm font-bold tracking-wide text-[#0A2342]">ARC</span>
             <span x-show="!sidebarCollapsed" x-cloak class="min-w-0">
-                <span class="block truncate text-sm font-semibold tracking-wide">ARC Management</span>
+                <span class="block truncate text-sm font-semibold tracking-wide">
+                    {{ \App\Models\SystemConfig::where('config_key', 'app_name')->value('config_value') ?? 'ARC Management' }}
+                </span>
                 <span class="mt-0.5 block text-[11px] text-slate-300">Konsultasi Konstruksi</span>
             </span>
         </a>
@@ -114,9 +126,13 @@
 
     <div class="shrink-0 border-t border-white/10 p-3">
         <div class="flex items-center gap-3 rounded-lg px-2 py-2" :class="sidebarCollapsed ? 'justify-center' : ''">
-            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2A6F97] text-sm font-semibold text-white">
-                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-            </span>
+            @if (Auth::user()->avatar)
+                <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Foto Profil" class="h-9 w-9 shrink-0 rounded-full object-cover">
+            @else
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#2A6F97] text-sm font-semibold text-white">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                </span>
+            @endif
             <div x-show="!sidebarCollapsed" x-cloak class="min-w-0 flex-1">
                 <p class="truncate text-sm font-medium text-white">{{ Auth::user()->name }}</p>
                 <p class="truncate text-xs text-slate-400">{{ Auth::user()->email }}</p>
@@ -205,12 +221,16 @@
                     class="flex min-h-11 items-center gap-2 rounded-xl px-2 text-start transition hover:bg-[#F5F8FA] focus:outline-none focus:ring-2 focus:ring-[#14B8A6] sm:gap-3 sm:px-3"
                     aria-label="Buka menu profil"
                 >
-                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#E6F4F3] text-sm font-semibold text-[#0A2342]">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                    </span>
+                    @if (Auth::user()->avatar)
+                        <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Foto Profil" class="h-9 w-9 shrink-0 rounded-full object-cover border border-[#E3E8EF]">
+                    @else
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#E6F4F3] text-sm font-semibold text-[#0A2342]">
+                            {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                        </span>
+                    @endif
                     <span class="hidden min-w-0 text-start sm:block">
                         <span class="block max-w-36 truncate text-sm font-semibold text-[#0F1B2D]">{{ Auth::user()->name }}</span>
-                        <span class="block text-xs text-[#5B6B80]">Akun</span>
+                        <span class="block text-xs text-[#5B6B80]">{{ Auth::user()->role->name ?? 'Pengguna' }}</span>
                     </span>
                     <svg class="hidden h-4 w-4 text-[#5B6B80] sm:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="m7 10 5 5 5-5" />
@@ -221,6 +241,9 @@
             <x-slot name="content">
                 <x-dropdown-link :href="route('profile.edit')">
                     {{ __('Profil') }}
+                </x-dropdown-link>
+                <x-dropdown-link :href="route('profile.edit') . '#update-password'">
+                    {{ __('Ganti Password') }}
                 </x-dropdown-link>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

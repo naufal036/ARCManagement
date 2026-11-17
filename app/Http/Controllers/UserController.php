@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Role;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -41,7 +42,8 @@ class UserController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
 
-        User::create([
+        // 1. Tampung ke variabel $newUser
+        $newUser = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -51,6 +53,11 @@ class UserController extends Controller
             'email_verified_at' => now(),
         ]);
 
+        ActivityLog::record(
+            'Tambah Pengguna',
+            'Menambahkan akun pengguna baru: ' . $newUser->name . ' (' . $newUser->email . ').',
+            $newUser
+        );
 
         return redirect()->route('users.index')->with('success', 'Pengguna berhasil ditambahkan!');
     }
@@ -63,7 +70,7 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        // 1. Admin tidak boleh mengubah datanya sendiri dari menu Manajemen Pengguna
+        // Admin tidak boleh mengubah datanya sendiri dari menu Manajemen Pengguna
         if (Auth::id() === $user->id) {
             return back()->withErrors('Anda tidak dapat mengubah data Anda sendiri dari halaman ini.')->withInput();
         }
@@ -74,8 +81,7 @@ class UserController extends Controller
             ]);
         }
 
-
-        // 2. Sesama Admin hanya boleh diubah statusnya (aktif/nonaktif)
+        // Sesama Admin hanya boleh diubah statusnya (aktif/nonaktif)
         if ($user->role && $user->role->name === 'Admin') {
             $request->validate([
                 'status' => 'required|in:active,inactive',
@@ -89,7 +95,6 @@ class UserController extends Controller
                 $request->filled('password') ||
                 $request->hasFile('avatar')
             ) {
-
                 return back()->withErrors('Anda hanya diizinkan mengubah Status (Aktif/Nonaktif) untuk sesama Admin.')->withInput();
             }
 
@@ -97,10 +102,17 @@ class UserController extends Controller
                 'status' => $request->status,
             ]);
 
+            // 2. Log sebelum return redirect pertama
+            ActivityLog::record(
+                'Update Pengguna',
+                'Memperbarui data atau status akun pengguna: ' . $user->name . '.',
+                $user
+            );
+
             return redirect()->route('users.index')->with('success', 'Status Admin berhasil diperbarui!');
         }
 
-        // 3. Role di bawah Admin (Manajer, Karyawan) bisa diubah seluruh datanya
+        // Role di bawah Admin (Manajer, Karyawan) bisa diubah seluruh datanya
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
@@ -132,7 +144,12 @@ class UserController extends Controller
 
         $user->update($data);
 
-
+        // 3. Log sebelum return redirect kedua
+        ActivityLog::record(
+            'Update Pengguna',
+            'Memperbarui data atau status akun pengguna: ' . $user->name . '.',
+            $user
+        );
 
         return redirect()->route('users.index')->with('success', 'Data pengguna berhasil diperbarui!');
     }
