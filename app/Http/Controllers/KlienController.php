@@ -27,6 +27,11 @@ class KlienController extends Controller
         return view('klien.create');
     }
 
+    public function show(Klien $klien): View
+    {
+        return view('klien.show', compact('klien'));
+    }
+
     /**
      * Store a newly created resource in storage.
      */

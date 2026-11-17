@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Proyek extends Model
 {
@@ -31,5 +32,15 @@ class Proyek extends Model
             JenisPekerjaan::class,
             'jenis_pekerjaan_id'
         );
+    }
+
+    public function progressProyek(): HasMany
+    {
+        return $this->hasMany(ProgressProyek::class, 'proyek_id');
+    }
+
+    public function dokumenProyek(): HasMany
+    {
+        return $this->hasMany(DokumenProyek::class, 'proyek_id');
     }
 }

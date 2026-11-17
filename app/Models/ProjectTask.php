@@ -13,7 +13,7 @@ class ProjectTask extends Model
         'project_assignment_id',
         'task_name',
         'status',
-        'deadline',
+        'due_date',
     ];
 
     public function projectAssignment()

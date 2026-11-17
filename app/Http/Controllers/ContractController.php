@@ -25,9 +25,12 @@ class ContractController extends Controller
         $validated = $request->validate([
             'project_id' => 'required|exists:proyek,id',
             'contract_number' => 'required|string|max:255|unique:contracts,contract_number',
+            'contract_name' => 'required|string|max:255',
             'contract_date' => 'required|date',
-            'value' => 'required|numeric|min:0',
-            'description' => 'nullable|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'contract_value' => 'required|numeric|min:0',
+            'status' => 'required|string|max:255',
         ]);
 
         Contract::create($validated);
@@ -52,9 +55,12 @@ class ContractController extends Controller
         $validated = $request->validate([
             'project_id' => 'required|exists:proyek,id',
             'contract_number' => 'required|string|max:255|unique:contracts,contract_number,' . $contract->id,
+            'contract_name' => 'required|string|max:255',
             'contract_date' => 'required|date',
-            'value' => 'required|numeric|min:0',
-            'description' => 'nullable|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'contract_value' => 'required|numeric|min:0',
+            'status' => 'required|string|max:255',
         ]);
 
         $contract->update($validated);
