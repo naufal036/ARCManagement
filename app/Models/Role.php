@@ -7,7 +7,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Role extends Model
 {
-    protected $fillable = ['nama_role'];
+    protected $fillable = [
+        'name',
+        'description',
+        'nama_role',
+    ];
+
+    public function setNamaRoleAttribute(?string $value): void
+    {
+        $this->attributes['name'] = $value;
+    }
+
+    public function getNamaRoleAttribute(): ?string
+    {
+        return $this->attributes['name'] ?? null;
+    }
 
     public function users(): HasMany
     {
