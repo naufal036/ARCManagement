@@ -1,66 +1,117 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Data Proyek') }}</h2>
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <p class="text-sm font-medium text-[#0F766E]">Registrasi dan Data Induk</p>
+                <h2 class="text-2xl font-bold tracking-tight text-[#0A2342]">Proyek</h2>
+            </div>
+            <a href="{{ route('proyek.create') }}" class="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#0A2342] px-5 text-sm font-semibold text-white transition hover:bg-[#12385E] focus:outline-none focus:ring-2 focus:ring-[#14B8A6] focus:ring-offset-2">Registrasi Proyek</a>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-
-            @if (session('status'))
-                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4">
-                    <div class="text-sm text-indigo-700">
-                        @switch(session('status'))
-                            @case('proyek-created') {{ __('Data proyek berhasil ditambahkan.') }} @break
-                            @case('proyek-updated') {{ __('Data proyek berhasil diperbarui.') }} @break
-                            @case('proyek-deleted') {{ __('Data proyek berhasil dihapus.') }} @break
-                        @endswitch
-                    </div>
-                </div>
-            @endif
-
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div><h3 class="text-lg font-medium text-gray-900">{{ __('Daftar Proyek') }}</h3></div>
-                <div>
-                    <a href="{{ route('proyek.create') }}" class="px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">{{ __('Registrasi Proyek Baru') }}</a>
-                </div>
+    <div class="space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+        @if (session('status'))
+            <div role="status" class="rounded-xl border border-[#B7E4DC] bg-[#E6F4F3] px-4 py-3 text-sm font-medium text-[#0F766E]">
+                @switch(session('status'))
+                    @case('proyek-created') Proyek berhasil didaftarkan. @break
+                    @case('proyek-updated') Data proyek berhasil diperbarui. @break
+                    @case('proyek-deleted') Proyek berhasil dihapus. @break
+                @endswitch
             </div>
+        @endif
+        @if ($errors->any())
+            <div role="alert" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $errors->first() }}</div>
+        @endif
 
-            <div class="bg-white overflow-hidden shadow sm:rounded-lg border border-gray-200">
-                <div class="px-4 py-5 sm:px-6">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Kode Proyek') }}</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Nama Proyek') }}</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Klien') }}</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Jenis Pekerjaan') }}</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Tanggal') }}</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Status') }}</th>
-                                <th scope="col" class="relative px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Aksi') }}</th>
+        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+            <div class="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)]">
+                <p class="text-sm font-medium text-[#5B6B80]">Total Proyek</p>
+                <p class="mt-2 text-3xl font-bold text-[#0A2342]">{{ number_format($totalProyek) }}</p>
+            </div>
+            @foreach ($jumlahProyekPerStatus as $stat)
+                <div class="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)]">
+                    <p class="text-sm font-medium text-[#5B6B80]">{{ $stat->status }}</p>
+                    <p class="mt-2 text-3xl font-bold text-[#0A2342]">{{ number_format($stat->total) }}</p>
+                </div>
+            @endforeach
+        </section>
+
+        <section class="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_24px_rgba(15,27,45,0.05)]">
+            <form method="GET" action="{{ route('proyek.index') }}" class="grid gap-3 border-b border-[#E3E8EF] p-4 sm:grid-cols-2 xl:grid-cols-6 sm:p-5">
+                <label class="sr-only" for="search-proyek">Cari proyek</label>
+                <input id="search-proyek" type="search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Cari nama atau kode..." class="min-h-11 rounded-xl border-[#D7DFE8] text-sm focus:border-[#14B8A6] focus:ring-[#14B8A6]">
+                <label class="sr-only" for="filter-klien">Pilih klien</label>
+                <select id="filter-klien" name="klien_id" class="min-h-11 rounded-xl border-[#D7DFE8] text-sm focus:border-[#14B8A6] focus:ring-[#14B8A6]">
+                    <option value="">Semua klien</option>
+                    @foreach ($klien as $item)
+                        <option value="{{ $item->id }}" @selected(($filters['klien_id'] ?? '') == $item->id)>{{ $item->nama_klien }}</option>
+                    @endforeach
+                </select>
+                <label class="sr-only" for="filter-jenis">Pilih jenis pekerjaan</label>
+                <select id="filter-jenis" name="jenis_pekerjaan_id" class="min-h-11 rounded-xl border-[#D7DFE8] text-sm focus:border-[#14B8A6] focus:ring-[#14B8A6]">
+                    <option value="">Semua jenis pekerjaan</option>
+                    @foreach ($jenisPekerjaan as $item)
+                        <option value="{{ $item->id }}" @selected(($filters['jenis_pekerjaan_id'] ?? '') == $item->id)>{{ $item->nama_pekerjaan }}</option>
+                    @endforeach
+                </select>
+                <label class="sr-only" for="filter-status">Pilih status</label>
+                <select id="filter-status" name="status" class="min-h-11 rounded-xl border-[#D7DFE8] text-sm focus:border-[#14B8A6] focus:ring-[#14B8A6]">
+                    <option value="">Semua status</option>
+                    @foreach ($statuses as $status)
+                        <option value="{{ $status }}" @selected(($filters['status'] ?? '') === $status)>{{ $status }}</option>
+                    @endforeach
+                </select>
+                <button class="min-h-11 rounded-xl bg-[#0A2342] px-5 text-sm font-semibold text-white transition hover:bg-[#12385E] focus:outline-none focus:ring-2 focus:ring-[#14B8A6]">Terapkan</button>
+                <a href="{{ route('proyek.index') }}" class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#D7DFE8] px-4 text-sm font-semibold text-[#43546A] hover:bg-[#F5F8FA]">Reset</a>
+            </form>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-[#E3E8EF] text-sm">
+                    <thead class="bg-[#F8FAFC] text-left text-xs uppercase tracking-wide text-[#5B6B80]">
+                        <tr>
+                            <th class="px-5 py-3 font-semibold">Proyek</th>
+                            <th class="px-5 py-3 font-semibold">Klien / Jenis</th>
+                            <th class="px-5 py-3 font-semibold">Jadwal</th>
+                            <th class="px-5 py-3 font-semibold">Anggaran</th>
+                            <th class="px-5 py-3 font-semibold">Status</th>
+                            <th class="px-5 py-3 text-right font-semibold">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#E3E8EF]">
+                        @forelse ($proyek as $item)
+                            <tr class="transition hover:bg-[#F8FAFC]">
+                                <td class="px-5 py-4">
+                                    <a href="{{ route('proyek.show', $item) }}" class="font-semibold text-[#0A2342] hover:text-[#0F766E]">{{ $item->nama_proyek }}</a>
+                                    <p class="mt-1 text-xs text-[#718096]">{{ $item->kode_proyek }}</p>
+                                </td>
+                                <td class="px-5 py-4 text-[#43546A]">
+                                    <p>{{ $item->klien?->nama_klien ?? 'Klien tidak tersedia' }}</p>
+                                    <p class="mt-1 text-xs text-[#718096]">{{ $item->jenisPekerjaan?->nama_pekerjaan ?? 'Jenis tidak tersedia' }}</p>
+                                </td>
+                                <td class="whitespace-nowrap px-5 py-4 text-xs text-[#43546A]">
+                                    <p>{{ $item->tanggal_mulai?->format('d M Y') }}</p>
+                                    <p class="mt-1 text-[#718096]">Target: {{ $item->tanggal_selesai?->format('d M Y') ?? 'Belum ditentukan' }}</p>
+                                </td>
+                                <td class="whitespace-nowrap px-5 py-4 text-[#43546A]">{{ $item->anggaran !== null ? 'Rp '.number_format((float) $item->anggaran, 0, ',', '.') : '—' }}</td>
+                                <td class="px-5 py-4"><span class="inline-flex rounded-full bg-[#E6F4F3] px-3 py-1 text-xs font-semibold text-[#0F766E]">{{ $item->status }}</span></td>
+                                <td class="px-5 py-4 text-right">
+                                    <div class="inline-flex items-center gap-3">
+                                        <a href="{{ route('proyek.edit', $item) }}" class="font-semibold text-[#2A6F97] hover:text-[#0A2342]">Edit</a>
+                                        <form action="{{ route('proyek.destroy', $item) }}" method="POST" onsubmit="return confirm('Hapus proyek ini? Data proyek yang terhubung akan dipertahankan.')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="font-semibold text-red-600 hover:text-red-800">Hapus</button>
+                                        </form>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse ($proyek as $item)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item->kode_proyek }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->nama_proyek }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ optional($item->klien)->nama_klien ?? '-' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ optional($item->jenisPekerjaan)->nama_pekerjaan ?? '-' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ \Carbon\Carbon::parse($item->tanggal_mulai)->format('d M Y') }} @if ($item->tanggal_selesai) s/d {{ \Carbon\Carbon::parse($item->tanggal_selesai)->format('d M Y') }} @endif</td>
-                                    <td class="px-6 py-4 whitespace-nowrap"><span class="inline-flex px-2 py-1 text-xs font-semibold leading-full rounded-full @if ($item->status == 'Selesai') bg-green-100 text-green-800 @elseif ($item->status == 'Proses') bg-blue-100 text-blue-800 @elseif ($item->status == 'Ditunda') bg-yellow-100 text-yellow-800 @elseif ($item->status == 'Batal') bg-red-100 text-red-800 @else bg-gray-100 text-gray-800 @endif">{{ ucfirst($item->status) }}</span></td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="{{ route('proyek.edit', $item) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('Edit') }}</a>
-                                        <form action="{{ route('proyek.destroy', $item) }}" method="POST" class="inline-block">@csrf @method('DELETE') <button type="submit" class="text-red-600 hover:text-red-900 ml-3" onclick="return confirm('{{ __('Apakah Anda yakin ingin menghapus proyek ini?') }}')">{{ __('Hapus') }}</button></form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="7" class="px-6 py-4 text-sm text-gray-500 text-center">{{ __('Belum ada data proyek.') }}</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                {{ $proyek->links() }}
+                        @empty
+                            <tr><td colspan="6" class="px-5 py-12 text-center text-sm text-[#718096]">Tidak ada proyek yang cocok dengan filter ini.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-        </div>
+            <div class="border-t border-[#E3E8EF] px-4 py-4 sm:px-5">{{ $proyek->links() }}</div>
+        </section>
     </div>
 </x-app-layout>

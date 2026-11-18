@@ -22,9 +22,19 @@ class Proyek extends Model
         'jenis_pekerjaan_id',
         'tanggal_mulai',
         'tanggal_selesai',
+        'anggaran',
         'deskripsi',
         'status',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'tanggal_mulai' => 'date',
+            'tanggal_selesai' => 'date',
+            'anggaran' => 'decimal:2',
+        ];
+    }
 
     public function klien(): BelongsTo
     {
@@ -42,6 +52,16 @@ class Proyek extends Model
     public function progressProyek(): HasMany
     {
         return $this->hasMany(ProgressProyek::class, 'proyek_id');
+    }
+
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(Contract::class, 'project_id');
+    }
+
+    public function projectAssignments(): HasMany
+    {
+        return $this->hasMany(ProjectAssignment::class, 'project_id');
     }
 
     public function dokumenProyek(): HasMany

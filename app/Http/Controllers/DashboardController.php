@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contract;
+use App\Models\JenisPekerjaan;
 use App\Models\Klien;
 use App\Models\ProgressProyek;
 use App\Models\Proyek;
@@ -15,8 +16,15 @@ class DashboardController extends Controller
         return view('dashboard', [
             'totalProyek' => Proyek::count(),
             'totalKlien' => Klien::count(),
+            'totalJenisPekerjaan' => JenisPekerjaan::count(),
             'totalKontrak' => Contract::count(),
             'totalProgress' => ProgressProyek::count(),
+            'jumlahProyekPerStatus' => Proyek::query()
+                ->select('status')
+                ->selectRaw('COUNT(*) as total')
+                ->groupBy('status')
+                ->orderBy('status')
+                ->get(),
             'proyekTerbaru' => Proyek::with('klien')
                 ->latest()
                 ->take(5)
