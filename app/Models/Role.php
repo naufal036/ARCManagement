@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Schema;
 
 class Role extends Model
 {
-    // Daftarkan kolom yang boleh diisi
     protected $fillable = [
         'name',
         'nama_role',
@@ -34,9 +34,8 @@ class Role extends Model
         return Schema::hasColumn($this->getTable(), 'name') ? 'name' : 'nama_role';
     }
 
-    // Opsional: tambahkan relasi balik ke User jika nanti diperlukan
-    public function users()
+    public function users(): HasMany
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class, 'role_id');
     }
 }

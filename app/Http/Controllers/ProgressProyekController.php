@@ -178,7 +178,6 @@ class ProgressProyekController extends Controller
             'catatan' => ['nullable', 'string'],
             'rencana_selanjutnya' => ['nullable', 'string'],
         ]);
-
         $progressProyek->update($validated);
 
         return redirect()
