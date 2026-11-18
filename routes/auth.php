@@ -55,3 +55,8 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 });
+
+// Tambahkan di bagian paling bawah routes/auth.php
+Route::any('register', function () {
+    return redirect()->route('login');
+});
