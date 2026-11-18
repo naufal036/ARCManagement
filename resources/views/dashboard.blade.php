@@ -10,10 +10,11 @@
     </x-slot>
 
     <div class="space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             @foreach ([
                 ['label' => 'Total Proyek', 'value' => $totalProyek, 'route' => 'proyek.index', 'tone' => 'navy', 'icon' => 'M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
                 ['label' => 'Total Klien', 'value' => $totalKlien, 'route' => 'klien.index', 'tone' => 'teal', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8'],
+                ['label' => 'Jenis Pekerjaan', 'value' => $totalJenisPekerjaan, 'route' => 'jenis-pekerjaan.index', 'tone' => 'teal', 'icon' => 'M4 6h16M4 12h16M4 18h16 M8 6v.01M8 12v.01M8 18v.01'],
                 ['label' => 'Total Kontrak', 'value' => $totalKontrak, 'route' => 'contract.index', 'tone' => 'blue', 'icon' => 'M6 3h9l3 3v15H6z M15 3v4h4 M9 12h6 M9 16h6'],
                 ['label' => 'Laporan Progress', 'value' => $totalProgress, 'route' => 'progress-proyek.index', 'tone' => 'amber', 'icon' => 'M3 3v18h18 M7 14l4-4 4 3 6-7'],
             ] as $stat)
@@ -31,6 +32,26 @@
                 </a>
             @endforeach
         </div>
+
+        <section class="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)] sm:p-6">
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <h3 class="font-bold text-[#0A2342]">Ringkasan Data Proyek</h3>
+                    <p class="mt-1 text-xs text-[#5B6B80]">Jumlah proyek pada setiap status saat ini.</p>
+                </div>
+                <a href="{{ route('proyek.index') }}" class="text-sm font-semibold text-[#0F766E] hover:text-[#0A2342]">Buka daftar proyek</a>
+            </div>
+            <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                @forelse ($jumlahProyekPerStatus as $status)
+                    <div class="rounded-xl border border-[#E3E8EF] bg-[#F8FAFC] px-4 py-3">
+                        <p class="text-xs font-medium text-[#5B6B80]">{{ $status->status }}</p>
+                        <p class="mt-1 text-2xl font-bold text-[#0A2342]">{{ number_format($status->total) }}</p>
+                    </div>
+                @empty
+                    <p class="text-sm text-[#5B6B80]">Belum ada data proyek.</p>
+                @endforelse
+            </div>
+        </section>
 
         <div class="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
             <section class="rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_24px_rgba(15,27,45,0.05)]">

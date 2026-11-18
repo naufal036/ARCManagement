@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\JenisPekerjaan;
 use App\Models\Klien;
 use App\Models\Proyek;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class ProyekController extends Controller
@@ -14,21 +16,56 @@ class ProyekController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
+        $search = trim((string) $request->input('search', ''));
+        $query = Proyek::query()->with(['klien', 'jenisPekerjaan']);
+
+        if ($search !== '') {
+            $query->where(function (Builder $builder) use ($search): void {
+                $builder->where('nama_proyek', 'like', '%'.$search.'%')
+                    ->orWhere('kode_proyek', 'like', '%'.$search.'%');
+            });
+        }
+
+        if ($request->filled('klien_id')) {
+            $query->where('klien_id', $request->input('klien_id'));
+        }
+
+        if ($request->filled('jenis_pekerjaan_id')) {
+            $query->where('jenis_pekerjaan_id', $request->input('jenis_pekerjaan_id'));
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
         return view('proyek.index', [
-            'proyek' => Proyek::with(['klien', 'jenisPekerjaan'])->latest()->paginate(10),
+            'proyek' => $query->latest()->paginate(10)->withQueryString(),
+            'totalProyek' => Proyek::count(),
+            'jumlahProyekPerStatus' => Proyek::query()
+                ->select('status')
+                ->selectRaw('COUNT(*) as total')
+                ->groupBy('status')
+                ->orderBy('status')
+                ->get(),
+            'klien' => Klien::orderBy('nama_klien')->get(['id', 'nama_klien']),
+            'jenisPekerjaan' => JenisPekerjaan::orderBy('nama_pekerjaan')->get(['id', 'nama_pekerjaan']),
+            'statuses' => Proyek::query()->select('status')->distinct()->orderBy('status')->pluck('status'),
+            'filters' => $request->only(['search', 'klien_id', 'jenis_pekerjaan_id', 'status']),
         ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
         return view('proyek.create', [
             'klien' => Klien::orderBy('nama_klien')->get(),
             'jenisPekerjaan' => JenisPekerjaan::orderBy('nama_pekerjaan')->get(),
+            'selectedKlienId' => $request->input('klien_id'),
+            'selectedJenisPekerjaanId' => $request->input('jenis_pekerjaan_id'),
         ]);
     }
 
@@ -39,6 +76,9 @@ class ProyekController extends Controller
                 'klien',
                 'jenisPekerjaan',
                 'progressProyek' => fn ($query) => $query->latest('tanggal_laporan'),
+                'contracts' => fn ($query) => $query->latest('contract_date'),
+                'projectAssignments.user',
+                'dokumenProyek.kategoriDokumen',
             ]),
         ]);
     }
@@ -49,15 +89,17 @@ class ProyekController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'kode_proyek' => ['required', 'string', 'max:30', 'unique:proyek,kode_proyek'],
             'nama_proyek' => ['required', 'string', 'max:150'],
             'klien_id' => ['required', 'exists:klien,id'],
             'jenis_pekerjaan_id' => ['required', 'exists:jenis_pekerjaan,id'],
             'tanggal_mulai' => ['required', 'date'],
             'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
+            'anggaran' => ['nullable', 'numeric', 'min:0', 'decimal:0,2'],
             'deskripsi' => ['nullable', 'string'],
             'status' => ['required', 'string', 'max:30'],
         ]);
+
+        $validated['kode_proyek'] = 'PRJ-'.Str::ulid();
 
         Proyek::create($validated);
 
@@ -88,6 +130,7 @@ class ProyekController extends Controller
             'jenis_pekerjaan_id' => ['required', 'exists:jenis_pekerjaan,id'],
             'tanggal_mulai' => ['required', 'date'],
             'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
+            'anggaran' => ['nullable', 'numeric', 'min:0', 'decimal:0,2'],
             'deskripsi' => ['nullable', 'string'],
             'status' => ['required', 'string', 'max:30'],
         ]);
@@ -102,6 +145,16 @@ class ProyekController extends Controller
      */
     public function destroy(Proyek $proyek)
     {
+        if (
+            $proyek->contracts()->exists()
+            || $proyek->projectAssignments()->exists()
+            || $proyek->dokumenProyek()->exists()
+            || $proyek->progressProyek()->exists()
+        ) {
+            return Redirect::route('proyek.index')
+                ->withErrors(['proyek' => 'Proyek tidak dapat dihapus karena masih memiliki kontrak, penugasan, dokumen, atau laporan progress.']);
+        }
+
         $proyek->delete();
 
         return Redirect::route('proyek.index')->with('status', 'proyek-deleted');
