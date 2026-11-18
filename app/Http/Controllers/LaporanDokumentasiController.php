@@ -32,10 +32,11 @@ class LaporanDokumentasiController extends Controller
             })
             ->when($filters['search'] ?? null, function (Builder $query, string $search): void {
                 $query->where('nama_file_asli', 'like', '%'.$search.'%');
-            });
+            })
+            ->latest();
 
         return view('laporan-dokumentasi.index', [
-            'dokumentasi' => $documentationQuery->latest()->paginate(12)->withQueryString(),
+            'dokumentasi' => $documentationQuery->paginate(12)->withQueryString(),
             'proyeks' => Proyek::query()->orderBy('nama_proyek')->get(['id', 'nama_proyek']),
             'filters' => $filters,
         ]);

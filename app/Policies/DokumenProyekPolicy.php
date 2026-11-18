@@ -3,15 +3,15 @@
 namespace App\Policies;
 
 use App\Models\DokumenProyek;
-use App\Models\ProjectAssignment;
 use App\Models\Proyek;
+use App\Models\ProjectAssignment;
 use App\Models\User;
 
 class DokumenProyekPolicy
 {
     public function before(User $user, string $ability): ?bool
     {
-        return in_array($user->role?->name, ['Admin', 'Direktur'], true) ? true : null;
+        return in_array($user->role?->nama_role, ['Admin', 'Direktur'], true) ? true : null;
     }
 
     public function view(User $user, DokumenProyek $dokumenProyek): bool

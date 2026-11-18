@@ -4,13 +4,12 @@ use App\Models\DokumenProyek;
 use App\Models\JenisPekerjaan;
 use App\Models\KategoriDokumen;
 use App\Models\Klien;
-use App\Models\ProjectAssignment;
 use App\Models\Proyek;
+use App\Models\ProjectAssignment;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\VersiDokumen;
 use App\Services\DokumenFileService;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -384,7 +383,7 @@ it('rejects batches above the file count and total size limits', function (): vo
 });
 
 it('retries storage cleanup and logs when the disk remains unavailable', function (): void {
-    $disk = Mockery::mock(Filesystem::class);
+    $disk = Mockery::mock(\Illuminate\Contracts\Filesystem\Filesystem::class);
     $disk->shouldReceive('exists')->with('dokumen-proyek/1/orphan.pdf')->andReturn(true);
     $disk->shouldReceive('delete')->with(['dokumen-proyek/1/orphan.pdf'])->times(3)->andReturn(false);
     Storage::shouldReceive('disk')->with('local')->andReturn($disk);

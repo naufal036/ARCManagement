@@ -11,14 +11,12 @@ class ContractController extends Controller
     public function index()
     {
         $contracts = Contract::with('proyek')->latest()->get();
-
         return view('contract.index', compact('contracts'));
     }
 
     public function create()
     {
         $proyeks = Proyek::all();
-
         return view('contract.create', compact('proyeks'));
     }
 
@@ -43,14 +41,12 @@ class ContractController extends Controller
     public function show(Contract $contract)
     {
         $contract->load(['proyek', 'contractAddendums']);
-
         return view('contract.show', compact('contract'));
     }
 
     public function edit(Contract $contract)
     {
         $proyeks = Proyek::all();
-
         return view('contract.edit', compact('contract', 'proyeks'));
     }
 
@@ -58,7 +54,7 @@ class ContractController extends Controller
     {
         $validated = $request->validate([
             'project_id' => 'required|exists:proyek,id',
-            'contract_number' => 'required|string|max:255|unique:contracts,contract_number,'.$contract->id,
+            'contract_number' => 'required|string|max:255|unique:contracts,contract_number,' . $contract->id,
             'contract_name' => 'required|string|max:255',
             'contract_date' => 'required|date',
             'start_date' => 'required|date',

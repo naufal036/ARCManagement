@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\DokumenProyek;
 use App\Models\KategoriDokumen;
-use App\Models\ProgressProyek;
-use App\Models\ProjectAssignment;
 use App\Models\Proyek;
+use App\Models\ProjectAssignment;
+use App\Models\ProgressProyek;
 use App\Models\User;
 use App\Models\VersiDokumen;
 use App\Services\DokumenFileService;
@@ -208,12 +208,12 @@ class DokumenProyekController extends Controller
 
     private function canManageAll(User $user): bool
     {
-        return in_array($user->role?->name, ['Admin', 'Direktur'], true);
+        return in_array($user->role?->nama_role, ['Admin', 'Direktur'], true);
     }
 
     private function ensureProgressBelongsToProject(?int $progressId, int $projectId): void
     {
-        if ($progressId !== null && ! ProgressProyek::query()
+        if ($progressId !== null && ! \App\Models\ProgressProyek::query()
             ->whereKey($progressId)
             ->where('proyek_id', $projectId)
             ->exists()) {

@@ -106,7 +106,6 @@ class VersiDokumenController extends Controller
                         $storedPaths[] = $path;
                         $lockedDocument->versiDokumen()->create([
                             'nomor_versi' => $nextVersion++,
-                            'nama_file' => Str::substr(basename($file->getClientOriginalName()), 0, 255),
                             'nama_file_asli' => Str::substr(basename($file->getClientOriginalName()), 0, 255),
                             'nama_file_storage' => $storageName,
                             'path_file' => $path,
