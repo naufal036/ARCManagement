@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -23,20 +26,18 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's profile information.
+     * Update the user's profile information and optional password.
      */
     public function update(Request $request): RedirectResponse
     {
         $user = $request->user();
 
-        // 1. Paksa email menjadi huruf kecil sebelum divalidasi (N dan n otomatis dianggap sama)
         if ($request->filled('email')) {
             $request->merge([
                 'email' => strtolower(trim($request->email)),
             ]);
         }
 
-        // 2. Validasi data dengan mengabaikan ID akun user yang sedang login
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => [
@@ -47,7 +48,9 @@ class ProfileController extends Controller
                 Rule::unique('users', 'email')->ignore($user->id),
             ],
             'phone' => ['nullable', 'string', 'max:20'],
-            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'], // Batas 2MB (bisa diubah ke 5120 jika ingin 5MB)
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'current_password' => ['nullable', 'required_with:password', 'current_password'],
+            'password' => ['nullable', 'required_with:current_password', 'confirmed', Password::defaults()],
         ]);
 
         $user->name = $validated['name'];
@@ -59,7 +62,6 @@ class ProfileController extends Controller
         }
 
         if ($request->hasFile('avatar')) {
-            // Hapus avatar lama jika ada agar penyimpanan server tidak penuh
             if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
                 Storage::disk('public')->delete($user->avatar);
             }
@@ -68,7 +70,13 @@ class ProfileController extends Controller
             $user->avatar = $path;
         }
 
+        if ($request->filled('password')) {
+            $user->password = Hash::make($validated['password']);
+        }
+
         $user->save();
+
+        ActivityLog::record('Update Profil', 'Memperbarui data profil pribadi atau kata sandi.', $user);
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
@@ -86,7 +94,6 @@ class ProfileController extends Controller
 
         Auth::logout();
 
-        // Hapus foto avatar dari penyimpanan saat akun dihapus
         if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
             Storage::disk('public')->delete($user->avatar);
         }

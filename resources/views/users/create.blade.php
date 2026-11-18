@@ -54,7 +54,7 @@
                         </svg>
                     </button>
                 </div>
-                <p class="text-xs text-gray-500 mt-1">Gunakan password standar (misal: password123) untuk login pertama kali.</p>
+                <p class="text-xs text-gray-500 mt-1">Password Minimal 8 Karakter</p>
             </div>
 
             <div class="mb-4">

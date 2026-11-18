@@ -24,14 +24,19 @@ class Role extends Model
         $this->attributes[$this->roleNameColumn()] = $value;
     }
 
-    public function setNamaRoleAttribute(string $value): void
-    {
-        $this->attributes[$this->roleNameColumn()] = $value;
-    }
-
     private function roleNameColumn(): string
     {
         return Schema::hasColumn($this->getTable(), 'name') ? 'name' : 'nama_role';
+    }
+
+    public function getNamaRoleAttribute(): ?string
+    {
+        return $this->attributes['nama_role'] ?? $this->attributes['name'] ?? null;
+    }
+
+    public function setNamaRoleAttribute(string $value): void
+    {
+        $this->attributes[$this->roleNameColumn()] = $value;
     }
 
     public function users(): HasMany
