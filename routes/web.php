@@ -69,6 +69,19 @@ Route::middleware('auth')->group(function () {
         ->name('progress-proyek.dokumentasi.download');
     Route::resource('progress-proyek', ProgressProyekController::class)
         ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
+
+    // ===== Kontrak & Assignment =====
+    Route::get('contract/{contract}/file', [\App\Http\Controllers\ContractController::class, 'download'])
+        ->name('contract.file.download');
+    Route::post('contract/{contract}/addendums', [\App\Http\Controllers\ContractAddendumController::class, 'store'])
+        ->name('contract.addendums.store');
+    Route::put('contract/{contract}/addendums/{contractAddendum}', [\App\Http\Controllers\ContractAddendumController::class, 'update'])
+        ->name('contract.addendums.update');
+    Route::delete('contract/{contract}/addendums/{contractAddendum}', [\App\Http\Controllers\ContractAddendumController::class, 'destroy'])
+        ->name('contract.addendums.destroy');
+    Route::get('contract/{contract}/addendums/{contractAddendum}/file', [\App\Http\Controllers\ContractAddendumController::class, 'download'])
+        ->name('contract.addendums.file.download');
+    Route::resource('project-task', \App\Http\Controllers\ProjectTaskController::class);
 });
 
 require __DIR__.'/auth.php';
