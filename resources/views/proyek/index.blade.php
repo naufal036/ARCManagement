@@ -23,17 +23,47 @@
             <div role="alert" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $errors->first() }}</div>
         @endif
 
-        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-            <div class="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)]">
-                <p class="text-sm font-medium text-[#5B6B80]">Total Proyek</p>
-                <p class="mt-2 text-3xl font-bold text-[#0A2342]">{{ number_format($totalProyek) }}</p>
-            </div>
-            @foreach ($jumlahProyekPerStatus as $stat)
-                <div class="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)]">
-                    <p class="text-sm font-medium text-[#5B6B80]">{{ $stat->status }}</p>
-                    <p class="mt-2 text-3xl font-bold text-[#0A2342]">{{ number_format($stat->total) }}</p>
+        <section aria-label="Statistik proyek" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <article class="flex min-h-36 items-start justify-between gap-4 rounded-2xl border border-[#E3E8EF] border-l-4 border-l-[#0A2342] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,27,45,0.09)]">
+                <div>
+                    <p class="text-sm font-medium text-[#5B6B80]">Total Proyek</p>
+                    <p class="mt-3 text-3xl font-bold tracking-tight text-[#0A2342]">{{ number_format($totalProyek) }}</p>
+                    <p class="mt-1 text-xs text-[#718096]">Seluruh proyek terdaftar</p>
                 </div>
-            @endforeach
+                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#EEF3F8] text-[#0A2342]">
+                    <svg aria-hidden="true" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4" />
+                        <path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01M14 12v.01M14 15v.01M14 18v.01" />
+                    </svg>
+                </span>
+            </article>
+            <article class="flex min-h-36 items-start justify-between gap-4 rounded-2xl border border-[#E3E8EF] border-l-4 border-l-[#8793A2] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,27,45,0.09)]">
+                <div>
+                    <p class="text-sm font-medium text-[#5B6B80]">Perencanaan</p>
+                    <p class="mt-3 text-3xl font-bold tracking-tight text-[#0A2342]">{{ number_format($proyekPerencanaan) }}</p>
+                    <p class="mt-1 text-xs text-[#718096]">Proyek yang sedang direncanakan</p>
+                </div>
+                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#F1F4F7] text-[#5B6B80]">
+                    <svg aria-hidden="true" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="5" width="18" height="16" rx="2" />
+                        <path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 17h6" />
+                    </svg>
+                </span>
+            </article>
+            <article class="flex min-h-36 items-start justify-between gap-4 rounded-2xl border border-[#E3E8EF] border-l-4 border-l-[#14B8A6] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,27,45,0.09)]">
+                <div>
+                    <p class="text-sm font-medium text-[#5B6B80]">Proses</p>
+                    <p class="mt-3 text-3xl font-bold tracking-tight text-[#0A2342]">{{ number_format($proyekProses) }}</p>
+                    <p class="mt-1 text-xs text-[#718096]">Proyek yang sedang berjalan</p>
+                </div>
+                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#E6F4F3] text-[#0F766E]">
+                    <svg aria-hidden="true" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19V5M4 19h16" />
+                        <path d="m7 15 4-4 3 2 5-6" />
+                        <path d="M15 7h4v4" />
+                    </svg>
+                </span>
+            </article>
         </section>
 
         <section class="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_24px_rgba(15,27,45,0.05)]">

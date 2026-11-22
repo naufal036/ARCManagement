@@ -32,7 +32,6 @@ class KlienController extends Controller
             'klien' => $query->orderBy('nama_klien')->paginate(10)->withQueryString(),
             'totalKlien' => Klien::count(),
             'klienDenganProyek' => Klien::has('proyek')->count(),
-            'klienTanpaProyek' => Klien::doesntHave('proyek')->count(),
             'search' => $search,
             'projectFilter' => $request->input('project_filter', 'all'),
         ]);

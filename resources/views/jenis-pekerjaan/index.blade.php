@@ -25,14 +25,34 @@
             <div role="alert" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{{ $errors->first() }}</div>
         @endif
 
-        <div class="grid gap-4 sm:grid-cols-3">
-            @foreach ([['label' => 'Total Kategori', 'value' => $totalJenisPekerjaan], ['label' => 'Digunakan Proyek', 'value' => $jenisDenganProyek], ['label' => 'Belum Digunakan', 'value' => $jenisTanpaProyek]] as $stat)
-                <div class="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)]">
-                    <p class="text-sm font-medium text-[#5B6B80]">{{ $stat['label'] }}</p>
-                    <p class="mt-2 text-3xl font-bold text-[#0A2342]">{{ number_format($stat['value']) }}</p>
+        <section aria-label="Statistik jenis pekerjaan" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <article class="flex min-h-36 items-start justify-between gap-4 rounded-2xl border border-[#E3E8EF] border-l-4 border-l-[#0A2342] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,27,45,0.09)]">
+                <div>
+                    <p class="text-sm font-medium text-[#5B6B80]">Total Jenis Pekerjaan</p>
+                    <p class="mt-3 text-3xl font-bold tracking-tight text-[#0A2342]">{{ number_format($totalJenisPekerjaan) }}</p>
+                    <p class="mt-1 text-xs text-[#718096]">Seluruh jenis pekerjaan terdaftar</p>
                 </div>
-            @endforeach
-        </div>
+                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#EEF3F8] text-[#0A2342]">
+                    <svg aria-hidden="true" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 6h11M9 12h11M9 18h11" />
+                        <path d="M4 6h.01M4 12h.01M4 18h.01" />
+                    </svg>
+                </span>
+            </article>
+            <article class="flex min-h-36 items-start justify-between gap-4 rounded-2xl border border-[#E3E8EF] border-l-4 border-l-[#14B8A6] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,27,45,0.09)]">
+                <div>
+                    <p class="text-sm font-medium text-[#5B6B80]">Digunakan pada Proyek</p>
+                    <p class="mt-3 text-3xl font-bold tracking-tight text-[#0A2342]">{{ number_format($jenisDenganProyek) }}</p>
+                    <p class="mt-1 text-xs text-[#718096]">Jenis pekerjaan dengan minimal satu proyek</p>
+                </div>
+                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#E6F4F3] text-[#0F766E]">
+                    <svg aria-hidden="true" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="7" width="18" height="14" rx="2" />
+                        <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2" />
+                    </svg>
+                </span>
+            </article>
+        </section>
 
         <section class="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_24px_rgba(15,27,45,0.05)]">
             <form method="GET" action="{{ route('jenis-pekerjaan.index') }}" class="grid gap-3 border-b border-[#E3E8EF] p-4 sm:grid-cols-[minmax(0,1fr)_220px_auto_auto] sm:p-5">

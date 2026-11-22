@@ -35,7 +35,6 @@ class JenisPekerjaanController extends Controller
             'jenisPekerjaan' => $query->orderBy('nama_pekerjaan')->paginate(10)->withQueryString(),
             'totalJenisPekerjaan' => JenisPekerjaan::count(),
             'jenisDenganProyek' => JenisPekerjaan::has('proyek')->count(),
-            'jenisTanpaProyek' => JenisPekerjaan::doesntHave('proyek')->count(),
             'search' => $search,
             'projectFilter' => $request->input('project_filter', 'all'),
         ]);

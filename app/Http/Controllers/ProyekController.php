@@ -40,15 +40,17 @@ class ProyekController extends Controller
             $query->where('status', $request->input('status'));
         }
 
+        $projectStatistics = Proyek::query()
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw('COUNT(CASE WHEN status = ? THEN 1 END) as perencanaan', ['Perencanaan'])
+            ->selectRaw('COUNT(CASE WHEN status = ? THEN 1 END) as proses', ['Proses'])
+            ->first();
+
         return view('proyek.index', [
             'proyek' => $query->latest()->paginate(10)->withQueryString(),
-            'totalProyek' => Proyek::count(),
-            'jumlahProyekPerStatus' => Proyek::query()
-                ->select('status')
-                ->selectRaw('COUNT(*) as total')
-                ->groupBy('status')
-                ->orderBy('status')
-                ->get(),
+            'totalProyek' => (int) $projectStatistics->total,
+            'proyekPerencanaan' => (int) $projectStatistics->perencanaan,
+            'proyekProses' => (int) $projectStatistics->proses,
             'klien' => Klien::orderBy('nama_klien')->get(['id', 'nama_klien']),
             'jenisPekerjaan' => JenisPekerjaan::orderBy('nama_pekerjaan')->get(['id', 'nama_pekerjaan']),
             'statuses' => Proyek::query()->select('status')->distinct()->orderBy('status')->pluck('status'),
