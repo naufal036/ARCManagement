@@ -20,6 +20,18 @@
                         </div>
 
                         <div>
+                            <x-input-label for="jenis_client" value="{{ __('Jenis Client') }}" />
+                            <select id="jenis_client" name="jenis_client" required class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">@foreach (['Sekolah', 'Pemerintah', 'Swasta', 'Lainnya'] as $jenis)<option value="{{ $jenis }}" @selected(old('jenis_client', $klien->jenis_client) === $jenis)>{{ $jenis }}</option>@endforeach</select>
+                            <x-input-error :messages="$errors->get('jenis_client')" class="mt-2" />
+                        </div>
+
+                        <div>
+                            <x-input-label for="npsn" value="{{ __('NPSN (opsional)') }}" />
+                            <x-text-input id="npsn" name="npsn" type="text" value="{{ old('npsn', $klien->npsn) }}" />
+                            <x-input-error :messages="$errors->get('npsn')" class="mt-2" />
+                        </div>
+
+                        <div>
                             <x-input-label for="alamat" value="{{ __('Alamat') }}" />
                             <textarea id="alamat" name="alamat" rows="3" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('alamat', $klien->alamat) }}</textarea>
                             <x-input-error :messages="$errors->get('alamat')" class="mt-2" />

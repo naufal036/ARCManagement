@@ -12,7 +12,15 @@ class JenisPekerjaan extends Model
     protected $fillable = [
         'nama_pekerjaan',
         'deskripsi',
+        'is_active',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+        ];
+    }
 
     public function proyek(): HasMany
     {

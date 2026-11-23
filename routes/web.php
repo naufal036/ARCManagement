@@ -9,8 +9,8 @@ use App\Http\Controllers\KategoriDokumenController;
 use App\Http\Controllers\KlienController;
 use App\Http\Controllers\LaporanDokumentasiController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProjectAssignmentController;
 use App\Http\Controllers\ProgressProyekController;
+use App\Http\Controllers\ProjectAssignmentController;
 use App\Http\Controllers\ProyekController;
 use App\Http\Controllers\VersiDokumenController;
 use Illuminate\Support\Facades\Route;
@@ -30,7 +30,11 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('klien', KlienController::class);
     Route::resource('jenis-pekerjaan', JenisPekerjaanController::class);
+    Route::post('jenis-pekerjaan/{jenisPekerjaan}/toggle', [JenisPekerjaanController::class, 'toggle'])
+        ->name('jenis-pekerjaan.toggle');
     Route::resource('proyek', ProyekController::class);
+    Route::delete('proyek/{proyek}/cover', [ProyekController::class, 'removeCover'])
+        ->name('proyek.cover.destroy');
     Route::resource('contract', ContractController::class);
     Route::resource('project-assignment', ProjectAssignmentController::class);
     Route::get('/laporan-dokumentasi', [LaporanDokumentasiController::class, 'index'])
