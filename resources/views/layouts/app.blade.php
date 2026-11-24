@@ -20,13 +20,13 @@
             x-data="{ sidebarCollapsed: false, mobileNavOpen: false }"
             @resize.window.debounce.100ms="if (window.innerWidth < 1024) sidebarCollapsed = false"
             @keydown.escape.window="mobileNavOpen = false"
-            class="min-h-screen bg-[#F5F8FA] text-[#0F1B2D]"
+            class="min-h-screen bg-[#F4F7FB] text-[#1E293B]"
         >
             @include('layouts.navigation')
 
             <div class="app-main" :class="sidebarCollapsed ? 'app-main--collapsed' : ''">
                 @isset($header)
-                    <header class="border-b border-[#E3E8EF] bg-white">
+                    <header class="border-b border-[#E2E8F0] bg-white">
                         <div class="px-4 py-5 sm:px-6 lg:px-8">
                             {{ $header }}
                         </div>

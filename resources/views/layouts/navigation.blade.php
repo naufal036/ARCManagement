@@ -1,31 +1,34 @@
 @php
     $navigationGroups = [
         [
-            'label' => 'Utama',
+            'label' => 'Workspace',
             'items' => [
                 ['label' => 'Dashboard', 'route' => 'dashboard', 'active' => 'dashboard', 'icon' => 'M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z'],
+                ['label' => 'Projects', 'route' => 'proyek.index', 'active' => 'proyek.*', 'icon' => 'M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
+                ['label' => 'Documents', 'route' => 'dokumen-proyek.index', 'active' => 'dokumen-proyek.*', 'icon' => 'M6 3h8l4 4v14H6z M14 3v5h5 M9 13h6 M9 17h4'],
+                ['label' => 'Progress', 'route' => 'progress-proyek.index', 'active' => 'progress-proyek.*', 'icon' => 'M3 3v18h18 M7 14l4-4 4 3 6-7'],
+                ['label' => 'Team', 'route' => 'project-assignment.index', 'active' => 'project-assignment.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M17 11h4 M19 9v4'],
+                ['label' => 'Storage', 'route' => 'laporan-dokumentasi.index', 'active' => 'laporan-dokumentasi.*', 'icon' => 'M4 7h16v13H4z M4 7l2-3h5l2 3 M8 11h8'],
+                ['label' => 'Settings', 'route' => 'profile.edit', 'active' => 'profile.*', 'icon' => 'M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.2h-2.5v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H6.5v-2.5h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5V4h2.5v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2v2.5h-.2a1.7 1.7 0 0 0-1.5 1z'],
             ],
         ],
         [
-            'label' => 'Data Master',
+            'label' => 'Administration',
             'items' => [
-                ['label' => 'Klien', 'route' => 'klien.index', 'active' => 'klien.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M20 8v6 M23 11h-6'],
+                ['label' => 'Clients', 'route' => 'klien.index', 'active' => 'klien.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M20 8v6 M23 11h-6'],
                 ['label' => 'Jenis Pekerjaan', 'route' => 'jenis-pekerjaan.index', 'active' => 'jenis-pekerjaan.*', 'icon' => 'M4 4h16v16H4z M8 8h8 M8 12h8 M8 16h5'],
             ],
         ],
         [
-            'label' => 'Operasional Proyek',
+            'label' => 'Project Operations',
             'items' => [
-                ['label' => 'Proyek', 'route' => 'proyek.index', 'active' => 'proyek.*', 'icon' => 'M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
-                ['label' => 'Kontrak', 'route' => 'contract.index', 'active' => 'contract.*', 'icon' => 'M6 3h9l3 3v15H6z M15 3v4h4 M9 12h6 M9 16h6'],
-                ['label' => 'Project Assignment', 'route' => 'project-assignment.index', 'active' => 'project-assignment.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M17 11h4 M19 9v4'],
-                ['label' => 'Progress Reporting', 'route' => 'progress-proyek.index', 'active' => 'progress-proyek.*', 'icon' => 'M3 3v18h18 M7 14l4-4 4 3 6-7'],
+                ['label' => 'Contracts', 'route' => 'contract.index', 'active' => 'contract.*', 'icon' => 'M6 3h9l3 3v15H6z M15 3v4h4 M9 12h6 M9 16h6'],
+                ['label' => 'Project Assignments', 'route' => 'project-assignment.index', 'active' => 'project-assignment.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M17 11h4 M19 9v4'],
             ],
         ],
         [
             'label' => 'Document Management',
             'items' => [
-                ['label' => 'Daftar Dokumen', 'route' => 'dokumen-proyek.index', 'active' => 'dokumen-proyek.*', 'icon' => 'M6 3h8l4 4v14H6z M14 3v5h5 M9 13h6 M9 17h6'],
                 ['label' => 'Laporan Dokumentasi', 'route' => 'laporan-dokumentasi.index', 'active' => 'laporan-dokumentasi.*', 'icon' => 'M4 4h16v16H4z M8 8h8 M8 12h5 M8 16h8'],
             ],
         ],
@@ -52,22 +55,22 @@
     x-show="mobileNavOpen"
     x-cloak
     @click="mobileNavOpen = false"
-    class="fixed inset-0 z-40 bg-[#071A33]/60 lg:hidden"
+    class="fixed inset-0 z-40 bg-[#172B4D]/60 lg:hidden"
     aria-hidden="true"
 ></div>
 
 <aside
     id="app-sidebar"
-    class="app-sidebar fixed inset-y-0 start-0 z-50 flex h-screen flex-col border-e border-white/10 bg-[#0A2342] text-white shadow-xl transition-[width,transform] duration-200 ease-out"
+    class="app-sidebar fixed inset-y-0 start-0 z-50 flex h-screen flex-col border-e border-white/10 bg-[#172B4D] text-white shadow-xl transition-[width,transform] duration-200 ease-out"
     :class="(mobileNavOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0') + (sidebarCollapsed ? ' app-sidebar--collapsed' : '')"
     aria-label="Navigasi utama"
 >
-    <div class="flex h-[76px] shrink-0 items-center justify-between border-b border-white/10 px-5">
-        <a href="{{ route('dashboard') }}" class="flex min-w-0 items-center gap-3" aria-label="ARCManagement Dashboard">
-            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#14B8A6] text-sm font-bold tracking-wide text-[#0A2342]">ARC</span>
+    <div class="flex h-[80px] shrink-0 items-center justify-between border-b border-white/10 px-5">
+        <a href="{{ route('dashboard') }}" class="flex min-w-0 items-center gap-3" aria-label="ARC Management Dashboard">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] text-xs font-bold tracking-wide text-white">ARC</span>
             <span x-show="!sidebarCollapsed" x-cloak class="min-w-0">
-                <span class="block truncate text-sm font-bold tracking-wide">ARCManagement</span>
-                <span class="mt-0.5 block text-[11px] text-slate-300">Manajemen Konstruksi</span>
+                <span class="block truncate text-sm font-bold tracking-wide">ARC MANAGEMENT</span>
+                <span class="mt-0.5 block truncate text-[10px] uppercase tracking-[0.12em] text-slate-300">Project &amp; Document</span>
             </span>
         </a>
         <button type="button" @click="mobileNavOpen = false" class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 hover:bg-white/10 hover:text-white lg:hidden" aria-label="Tutup navigasi">
@@ -82,7 +85,7 @@
                 <div class="space-y-1.5">
                     @foreach ($group['items'] as $item)
                         @php $isActive = request()->routeIs($item['active']); @endphp
-                        <a href="{{ route($item['route']) }}" @if ($isActive) aria-current="page" @endif :title="sidebarCollapsed ? '{{ $item['label'] }}' : null" class="flex min-h-11 items-center gap-3 rounded-xl border-s-2 px-3 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#14B8A6] {{ $isActive ? 'border-[#14B8A6] bg-white/10 text-white' : 'border-transparent text-slate-300 hover:bg-white/5 hover:text-white' }}" :class="sidebarCollapsed ? 'justify-center !px-0' : 'justify-start'">
+                        <a href="{{ route($item['route']) }}" @if ($isActive) aria-current="page" @endif :title="sidebarCollapsed ? '{{ $item['label'] }}' : null" class="flex min-h-11 items-center gap-3 rounded-xl border-s-2 px-3 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#93C5FD] {{ $isActive ? 'border-[#60A5FA] bg-[#2563EB] text-white shadow-lg shadow-[#172B4D]/20' : 'border-transparent text-slate-300 hover:bg-white/10 hover:text-white' }}" :class="sidebarCollapsed ? 'justify-center !px-0' : 'justify-start'">
                             <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ $item['icon'] }}" /></svg>
                             <span x-show="!sidebarCollapsed" x-cloak class="truncate">{{ $item['label'] }}</span>
                         </a>
@@ -110,7 +113,7 @@
     </div>
 </aside>
 
-<header class="app-topbar sticky top-0 z-30 flex h-[76px] items-center justify-between gap-4 border-b border-[#E3E8EF] bg-white px-4 sm:px-6 lg:px-8" :class="sidebarCollapsed ? 'app-topbar--collapsed' : ''">
+<header class="app-topbar sticky top-0 z-30 flex h-[80px] items-center justify-between gap-4 border-b border-[#E2E8F0] bg-white px-4 sm:px-6 lg:px-8" :class="sidebarCollapsed ? 'app-topbar--collapsed' : ''">
     <div class="flex min-w-0 flex-1 items-center gap-3">
         <button type="button" @click="sidebarCollapsed = !sidebarCollapsed" class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[#5B6B80] transition hover:bg-[#F5F8FA] hover:text-[#0A2342] focus:outline-none focus:ring-2 focus:ring-[#14B8A6] lg:inline-flex" :aria-label="sidebarCollapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'" :aria-expanded="!sidebarCollapsed">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 5h16M4 12h16M4 19h16M9 5v14" /></svg>

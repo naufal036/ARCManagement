@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Klien;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class KlienController extends Controller
@@ -13,28 +12,10 @@ class KlienController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request): View
+    public function index(): View
     {
-        $query = Klien::query()->withCount('proyek');
-        $search = trim((string) $request->input('search', ''));
-
-        if ($search !== '') {
-            $query->where('nama_klien', 'like', '%'.$search.'%');
-        }
-
-        if ($request->input('project_filter') === 'with_projects') {
-            $query->has('proyek');
-        } elseif ($request->input('project_filter') === 'without_projects') {
-            $query->doesntHave('proyek');
-        }
-
         return view('klien.index', [
-            'klien' => $query->orderBy('nama_klien')->paginate(10)->withQueryString(),
-            'totalKlien' => Klien::count(),
-            'klienDenganProyek' => Klien::has('proyek')->count(),
-            'klienTanpaProyek' => Klien::doesntHave('proyek')->count(),
-            'search' => $search,
-            'projectFilter' => $request->input('project_filter', 'all'),
+            'klien' => Klien::latest()->paginate(10),
         ]);
     }
 
@@ -48,14 +29,7 @@ class KlienController extends Controller
 
     public function show(Klien $klien): View
     {
-        return view('klien.show', [
-            'klien' => $klien,
-            'proyek' => $klien->proyek()
-                ->with('jenisPekerjaan')
-                ->latest()
-                ->paginate(8),
-            'jumlahProyek' => $klien->proyek()->count(),
-        ]);
+        return view('klien.show', compact('klien'));
     }
 
     /**
@@ -63,10 +37,10 @@ class KlienController extends Controller
      */
     public function store(Request $request)
     {
-        $request->merge(['nama_klien' => trim((string) $request->input('nama_klien'))]);
-
         $validated = $request->validate([
-            'nama_klien' => ['required', 'string', 'max:150', Rule::unique('klien', 'nama_klien')],
+            'nama_klien' => ['required', 'string', 'max:150'],
+            'jenis_client' => ['required', 'in:Sekolah,Pemerintah,Swasta,Lainnya'],
+            'npsn' => ['nullable', 'string', 'max:20'],
             'alamat' => ['nullable', 'string'],
             'no_telepon' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:100'],
@@ -92,10 +66,10 @@ class KlienController extends Controller
      */
     public function update(Request $request, Klien $klien)
     {
-        $request->merge(['nama_klien' => trim((string) $request->input('nama_klien'))]);
-
         $validated = $request->validate([
-            'nama_klien' => ['required', 'string', 'max:150', Rule::unique('klien', 'nama_klien')->ignore($klien->getKey())],
+            'nama_klien' => ['required', 'string', 'max:150'],
+            'jenis_client' => ['required', 'in:Sekolah,Pemerintah,Swasta,Lainnya'],
+            'npsn' => ['nullable', 'string', 'max:20'],
             'alamat' => ['nullable', 'string'],
             'no_telepon' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:100'],
@@ -111,11 +85,6 @@ class KlienController extends Controller
      */
     public function destroy(Klien $klien)
     {
-        if ($klien->proyek()->exists()) {
-            return Redirect::route('klien.index')
-                ->withErrors(['klien' => 'Klien tidak dapat dihapus karena masih digunakan oleh proyek.']);
-        }
-
         $klien->delete();
 
         return Redirect::route('klien.index')->with('status', 'klien-deleted');

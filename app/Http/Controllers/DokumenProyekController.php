@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DokumenProyek;
 use App\Models\KategoriDokumen;
+use App\Models\Klien;
 use App\Models\ProgressProyek;
 use App\Models\ProjectAssignment;
 use App\Models\Proyek;
@@ -27,22 +28,35 @@ class DokumenProyekController extends Controller
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:150'],
             'proyek_id' => ['nullable', 'integer', 'exists:proyek,id'],
+            'client_id' => ['nullable', 'integer', 'exists:klien,id'],
             'kategori_dokumen_id' => ['nullable', 'integer', 'exists:kategori_dokumen,id'],
             'ekstensi' => ['nullable', 'string', 'max:20'],
+            'format' => ['nullable', 'in:all,pdf,excel,word,image,archive'],
         ]);
+
+        $formatExtensions = [
+            'pdf' => ['pdf'],
+            'excel' => ['xls', 'xlsx'],
+            'word' => ['doc', 'docx'],
+            'image' => ['jpg', 'jpeg', 'png'],
+            'archive' => ['zip', 'rar'],
+        ];
 
         $visibleDocuments = $this->visibleDocuments($user);
         $query = (clone $visibleDocuments)
             ->with(['proyek', 'kategoriDokumen', 'versiTerbaru.pengunggah'])
             ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $query->where('nama_dokumen', 'like', '%'.$search.'%'))
             ->when($filters['proyek_id'] ?? null, fn (Builder $query, int $projectId) => $query->where('proyek_id', $projectId))
+            ->when($filters['client_id'] ?? null, fn (Builder $query, int $clientId) => $query->whereHas('proyek', fn (Builder $projectQuery) => $projectQuery->where('klien_id', $clientId)))
             ->when($filters['kategori_dokumen_id'] ?? null, fn (Builder $query, int $categoryId) => $query->where('kategori_dokumen_id', $categoryId))
             ->when($filters['ekstensi'] ?? null, fn (Builder $query, string $extension) => $query->whereHas('versiDokumen', fn (Builder $versionQuery) => $versionQuery->where('ekstensi', strtolower($extension))))
+            ->when(($filters['format'] ?? 'all') !== 'all' && isset($formatExtensions[$filters['format'] ?? '']), fn (Builder $query) => $query->whereHas('versiDokumen', fn (Builder $versionQuery) => $versionQuery->whereIn('ekstensi', $formatExtensions[$filters['format']])))
             ->latest();
 
         return view('dokumen-proyek.index', [
             'dokumenProyek' => $query->paginate(12)->withQueryString(),
             'proyeks' => $this->visibleProjects($user),
+            'klien' => Klien::query()->orderBy('nama_klien')->get(),
             'progressProyek' => $this->visibleProgress($user),
             'kategoriDokumen' => KategoriDokumen::query()->orderBy('nama_kategori')->get(),
             'filters' => $filters,
@@ -208,7 +222,7 @@ class DokumenProyekController extends Controller
 
     private function canManageAll(User $user): bool
     {
-        return in_array($user->role?->name, ['Admin', 'Direktur'], true);
+        return in_array($user->role?->nama_role, ['Admin', 'Direktur'], true);
     }
 
     private function ensureProgressBelongsToProject(?int $progressId, int $projectId): void

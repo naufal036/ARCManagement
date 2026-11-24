@@ -1,97 +1,87 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-                <p class="text-sm font-medium text-[#0F766E]">Master Data</p>
-                <h2 class="text-2xl font-bold tracking-tight text-[#0A2342]">Klien</h2>
-            </div>
-            <a href="{{ route('klien.create') }}" class="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#0A2342] px-5 text-sm font-semibold text-white transition hover:bg-[#12385E] focus:outline-none focus:ring-2 focus:ring-[#14B8A6] focus:ring-offset-2">
-                Tambah Klien
-            </a>
-        </div>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Data Klien') }}
+        </h2>
     </x-slot>
 
-    <div class="space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-        @if (session('status'))
-            <div role="status" class="rounded-xl border border-[#B7E4DC] bg-[#E6F4F3] px-4 py-3 text-sm font-medium text-[#0F766E]">
-                @switch(session('status'))
-                    @case('klien-created') Data klien berhasil ditambahkan. @break
-                    @case('klien-updated') Data klien berhasil diperbarui. @break
-                    @case('klien-deleted') Data klien berhasil dihapus. @break
-                @endswitch
-            </div>
-        @endif
-        @if ($errors->any())
-            <div role="alert" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                {{ $errors->first() }}
-            </div>
-        @endif
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-        <div class="grid gap-4 sm:grid-cols-3">
-            @foreach ([['label' => 'Total Klien', 'value' => $totalKlien, 'tone' => 'navy'], ['label' => 'Memiliki Proyek', 'value' => $klienDenganProyek, 'tone' => 'teal'], ['label' => 'Belum Memiliki Proyek', 'value' => $klienTanpaProyek, 'tone' => 'slate']] as $stat)
-                <div class="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)]">
-                    <p class="text-sm font-medium text-[#5B6B80]">{{ $stat['label'] }}</p>
-                    <p class="mt-2 text-3xl font-bold text-[#0A2342]">{{ number_format($stat['value']) }}</p>
+            @if (session('status'))
+                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4">
+                    <div class="text-sm text-indigo-700">
+                        @switch(session('status'))
+                            @case('klien-created')
+                                {{ __('Data klien berhasil ditambahkan.') }}
+                                @break
+                            @case('klien-updated')
+                                {{ __('Data klien berhasil diperbarui.') }}
+                                @break
+                            @case('klien-deleted')
+                                {{ __('Data klien berhasil dihapus.') }}
+                                @break
+                        @endswitch
+                    </div>
                 </div>
-            @endforeach
-        </div>
+            @endif
 
-        <section class="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_24px_rgba(15,27,45,0.05)]">
-            <form method="GET" action="{{ route('klien.index') }}" class="grid gap-3 border-b border-[#E3E8EF] p-4 sm:grid-cols-[minmax(0,1fr)_220px_auto_auto] sm:p-5">
-                <label class="sr-only" for="search-klien">Cari nama klien</label>
-                <input id="search-klien" type="search" name="search" value="{{ $search }}" placeholder="Cari nama klien..." class="min-h-11 rounded-xl border-[#D7DFE8] text-sm focus:border-[#14B8A6] focus:ring-[#14B8A6]">
-                <label class="sr-only" for="project-filter">Filter berdasarkan proyek</label>
-                <select id="project-filter" name="project_filter" class="min-h-11 rounded-xl border-[#D7DFE8] text-sm focus:border-[#14B8A6] focus:ring-[#14B8A6]">
-                    <option value="all" @selected($projectFilter === 'all')>Semua klien</option>
-                    <option value="with_projects" @selected($projectFilter === 'with_projects')>Memiliki proyek</option>
-                    <option value="without_projects" @selected($projectFilter === 'without_projects')>Belum memiliki proyek</option>
-                </select>
-                <button class="min-h-11 rounded-xl bg-[#0A2342] px-5 text-sm font-semibold text-white transition hover:bg-[#12385E] focus:outline-none focus:ring-2 focus:ring-[#14B8A6]">Terapkan</button>
-                <a href="{{ route('klien.index') }}" class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#D7DFE8] px-4 text-sm font-semibold text-[#43546A] hover:bg-[#F5F8FA]">Reset</a>
-            </form>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900">{{ __('Daftar Klien') }}</h3>
+                </div>
+                <div>
+                    <a href="{{ route('klien.create') }}" class="px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        {{ __('Tambah Klien') }}
+                    </a>
+                </div>
+            </div>
 
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-[#E3E8EF] text-sm">
-                    <thead class="bg-[#F8FAFC] text-left text-xs uppercase tracking-wide text-[#5B6B80]">
-                        <tr>
-                            <th class="px-5 py-3 font-semibold">Klien</th>
-                            <th class="px-5 py-3 font-semibold">Kontak</th>
-                            <th class="px-5 py-3 font-semibold">Proyek</th>
-                            <th class="px-5 py-3 text-right font-semibold">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-[#E3E8EF]">
-                        @forelse ($klien as $item)
-                            <tr class="transition hover:bg-[#F8FAFC]">
-                                <td class="px-5 py-4">
-                                    <a href="{{ route('klien.show', $item) }}" class="font-semibold text-[#0A2342] hover:text-[#0F766E]">{{ $item->nama_klien }}</a>
-                                    <p class="mt-1 max-w-md truncate text-xs text-[#718096]">{{ $item->alamat ?? 'Alamat belum diisi' }}</p>
-                                </td>
-                                <td class="px-5 py-4 text-[#43546A]">
-                                    <p>{{ $item->email ?? 'Email belum diisi' }}</p>
-                                    <p class="mt-1 text-xs text-[#718096]">{{ $item->no_telepon ?? 'Telepon belum diisi' }}</p>
-                                </td>
-                                <td class="px-5 py-4">
-                                    <span class="inline-flex rounded-full bg-[#E6F4F3] px-3 py-1 text-xs font-semibold text-[#0F766E]">{{ number_format($item->proyek_count) }} proyek</span>
-                                </td>
-                                <td class="px-5 py-4 text-right">
-                                    <div class="inline-flex items-center gap-3">
-                                        <a href="{{ route('klien.edit', $item) }}" class="font-semibold text-[#2A6F97] hover:text-[#0A2342]">Edit</a>
-                                        <form action="{{ route('klien.destroy', $item) }}" method="POST" onsubmit="return confirm('Yakin hapus klien ini?')">
+            <div class="bg-white overflow-hidden shadow sm:rounded-lg border border-gray-200">
+                <div class="px-4 py-5 sm:px-6">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Nama Klien') }}</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Jenis') }}</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('NPSN') }}</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Alamat') }}</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('No. Telepon') }}</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Email') }}</th>
+                                <th scope="col" class="relative px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Aksi') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @forelse ($klien as $item)
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item->nama_klien }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->jenis_client }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->npsn ?? '-' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->alamat ?? '-' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->no_telepon ?? '-' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->email ?? '-' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <a href="{{ route('klien.edit', $item) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('Edit') }}</a>
+                                        <form action="{{ route('klien.destroy', $item) }}" method="POST" class="inline-block">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="font-semibold text-red-600 hover:text-red-800">Hapus</button>
+                                            <button type="submit" class="text-red-600 hover:text-red-900 ml-3" onclick="return confirm('{{ __('Apakah Anda yakin ingin menghapus klien ini?') }}')">
+                                                {{ __('Hapus') }}
+                                            </button>
                                         </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr><td colspan="4" class="px-5 py-12 text-center text-sm text-[#718096]">Tidak ada klien yang cocok dengan pencarian ini.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="px-6 py-4 text-sm text-gray-500 text-center">{{ __('Belum ada data klien.') }}</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                {{ $klien->links() }}
             </div>
-            <div class="border-t border-[#E3E8EF] px-4 py-4 sm:px-5">{{ $klien->links() }}</div>
-        </section>
+        </div>
     </div>
 </x-app-layout>

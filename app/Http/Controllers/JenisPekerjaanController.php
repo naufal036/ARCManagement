@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\JenisPekerjaan;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class JenisPekerjaanController extends Controller
@@ -13,31 +13,10 @@ class JenisPekerjaanController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request): View
+    public function index(): View
     {
-        $query = JenisPekerjaan::query()->withCount('proyek');
-        $search = trim((string) $request->input('search', ''));
-
-        if ($search !== '') {
-            $query->where(function ($builder) use ($search): void {
-                $builder->where('nama_pekerjaan', 'like', '%'.$search.'%')
-                    ->orWhere('deskripsi', 'like', '%'.$search.'%');
-            });
-        }
-
-        if ($request->input('project_filter') === 'with_projects') {
-            $query->has('proyek');
-        } elseif ($request->input('project_filter') === 'without_projects') {
-            $query->doesntHave('proyek');
-        }
-
         return view('jenis-pekerjaan.index', [
-            'jenisPekerjaan' => $query->orderBy('nama_pekerjaan')->paginate(10)->withQueryString(),
-            'totalJenisPekerjaan' => JenisPekerjaan::count(),
-            'jenisDenganProyek' => JenisPekerjaan::has('proyek')->count(),
-            'jenisTanpaProyek' => JenisPekerjaan::doesntHave('proyek')->count(),
-            'search' => $search,
-            'projectFilter' => $request->input('project_filter', 'all'),
+            'jenisPekerjaan' => JenisPekerjaan::withCount('proyek')->latest()->paginate(10),
         ]);
     }
 
@@ -51,14 +30,7 @@ class JenisPekerjaanController extends Controller
 
     public function show(JenisPekerjaan $jenisPekerjaan): View
     {
-        return view('jenis-pekerjaan.show', [
-            'jenisPekerjaan' => $jenisPekerjaan,
-            'proyek' => $jenisPekerjaan->proyek()
-                ->with('klien')
-                ->latest()
-                ->paginate(8),
-            'jumlahProyek' => $jenisPekerjaan->proyek()->count(),
-        ]);
+        return view('jenis-pekerjaan.show', compact('jenisPekerjaan'));
     }
 
     /**
@@ -66,10 +38,8 @@ class JenisPekerjaanController extends Controller
      */
     public function store(Request $request)
     {
-        $request->merge(['nama_pekerjaan' => trim((string) $request->input('nama_pekerjaan'))]);
-
         $validated = $request->validate([
-            'nama_pekerjaan' => ['required', 'string', 'max:100', Rule::unique('jenis_pekerjaan', 'nama_pekerjaan')],
+            'nama_pekerjaan' => ['required', 'string', 'max:100'],
             'deskripsi' => ['nullable', 'string'],
         ]);
 
@@ -93,10 +63,8 @@ class JenisPekerjaanController extends Controller
      */
     public function update(Request $request, JenisPekerjaan $jenisPekerjaan)
     {
-        $request->merge(['nama_pekerjaan' => trim((string) $request->input('nama_pekerjaan'))]);
-
         $validated = $request->validate([
-            'nama_pekerjaan' => ['required', 'string', 'max:100', Rule::unique('jenis_pekerjaan', 'nama_pekerjaan')->ignore($jenisPekerjaan->getKey())],
+            'nama_pekerjaan' => ['required', 'string', 'max:100'],
             'deskripsi' => ['nullable', 'string'],
         ]);
 
@@ -111,12 +79,20 @@ class JenisPekerjaanController extends Controller
     public function destroy(JenisPekerjaan $jenisPekerjaan)
     {
         if ($jenisPekerjaan->proyek()->exists()) {
-            return Redirect::route('jenis-pekerjaan.index')
-                ->withErrors(['jenis_pekerjaan' => 'Jenis pekerjaan tidak dapat dihapus karena masih digunakan oleh proyek.']);
+            $jenisPekerjaan->update(['is_active' => false]);
+
+            return Redirect::route('jenis-pekerjaan.index')->with('status', 'jenis-pekerjaan-deactivated');
         }
 
         $jenisPekerjaan->delete();
 
         return Redirect::route('jenis-pekerjaan.index')->with('status', 'jenis-pekerjaan-deleted');
+    }
+
+    public function toggle(JenisPekerjaan $jenisPekerjaan): RedirectResponse
+    {
+        $jenisPekerjaan->update(['is_active' => ! $jenisPekerjaan->is_active]);
+
+        return Redirect::route('jenis-pekerjaan.index')->with('status', 'jenis-pekerjaan-toggled');
     }
 }

@@ -16,6 +16,8 @@ class Klien extends Model
 
     protected $fillable = [
         'nama_klien',
+        'jenis_client',
+        'npsn',
         'alamat',
         'no_telepon',
         'email',
