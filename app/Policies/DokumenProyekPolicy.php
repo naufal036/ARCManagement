@@ -3,8 +3,8 @@
 namespace App\Policies;
 
 use App\Models\DokumenProyek;
-use App\Models\Proyek;
 use App\Models\ProjectAssignment;
+use App\Models\Proyek;
 use App\Models\User;
 
 class DokumenProyekPolicy

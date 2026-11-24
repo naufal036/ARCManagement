@@ -7,6 +7,7 @@ use App\Models\JenisPekerjaan;
 use App\Models\KategoriDokumen;
 use App\Models\Klien;
 use App\Models\Proyek;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -65,7 +66,7 @@ class ProyekController extends Controller
             'klien' => Klien::orderBy('nama_klien')->get(['id', 'nama_klien']),
             'jenisPekerjaan' => JenisPekerjaan::orderBy('nama_pekerjaan')->get(['id', 'nama_pekerjaan']),
             'statuses' => Proyek::query()->select('status')->distinct()->orderBy('status')->pluck('status'),
-            'years' => Proyek::query()->selectRaw('YEAR(tanggal_mulai) as year')->distinct()->orderByDesc('year')->pluck('year'),
+            'years' => Proyek::query()->whereNotNull('tanggal_mulai')->pluck('tanggal_mulai')->map(fn ($d) => (int) Carbon::parse($d)->format('Y'))->unique()->values(),
             'filters' => [
                 'search' => $search,
                 'klien_id' => $request->input('klien_id'),

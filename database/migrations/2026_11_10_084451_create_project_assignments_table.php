@@ -19,14 +19,14 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('project_id')
-                  ->references('id')
-                  ->on('proyek')
-                  ->cascadeOnDelete();
+                ->references('id')
+                ->on('proyek')
+                ->cascadeOnDelete();
 
             $table->foreign('user_id')
-                  ->references('id')
-                  ->on('users')
-                  ->cascadeOnDelete();
+                ->references('id')
+                ->on('users')
+                ->cascadeOnDelete();
         });
     }
 

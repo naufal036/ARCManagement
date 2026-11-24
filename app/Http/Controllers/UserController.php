@@ -2,26 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Role;
 use App\Models\ActivityLog;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
     public function index()
     {
         $users = User::with('role')->get();
+
         return view('users.index', compact('users'));
     }
 
     public function create()
     {
         $roles = Role::all();
+
         return view('users.create', compact('roles'));
     }
 
@@ -55,7 +57,7 @@ class UserController extends Controller
 
         ActivityLog::record(
             'Tambah Pengguna',
-            'Menambahkan akun pengguna baru: ' . $newUser->name . ' (' . $newUser->email . ').',
+            'Menambahkan akun pengguna baru: '.$newUser->name.' ('.$newUser->email.').',
             $newUser
         );
 
@@ -65,6 +67,7 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $roles = Role::all();
+
         return view('users.edit', compact('user', 'roles'));
     }
 
@@ -105,7 +108,7 @@ class UserController extends Controller
             // 2. Log sebelum return redirect pertama
             ActivityLog::record(
                 'Update Pengguna',
-                'Memperbarui data atau status akun pengguna: ' . $user->name . '.',
+                'Memperbarui data atau status akun pengguna: '.$user->name.'.',
                 $user
             );
 
@@ -147,7 +150,7 @@ class UserController extends Controller
         // 3. Log sebelum return redirect kedua
         ActivityLog::record(
             'Update Pengguna',
-            'Memperbarui data atau status akun pengguna: ' . $user->name . '.',
+            'Memperbarui data atau status akun pengguna: '.$user->name.'.',
             $user
         );
 

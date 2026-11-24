@@ -20,9 +20,9 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('project_assignment_id')
-                  ->references('id')
-                  ->on('project_assignments')
-                  ->cascadeOnDelete();
+                ->references('id')
+                ->on('project_assignments')
+                ->cascadeOnDelete();
         });
     }
 

@@ -12,6 +12,7 @@ class ContractRequest extends FormRequest
     {
         return true;
     }
+
     protected function prepareForValidation(): void
     {
         $value = $this->input('contract_value');

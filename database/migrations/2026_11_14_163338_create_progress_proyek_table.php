@@ -14,31 +14,31 @@ return new class extends Migration
         Schema::create('progress_proyek', function (Blueprint $table) {
             $table->id();
 
-            //Relasi dengan tabel proyek
+            // Relasi dengan tabel proyek
             $table->unsignedBigInteger('proyek_id')->nullable();
             $table->foreign('proyek_id')->references('id')->on('proyek')->onDelete('cascade');
 
-            //Relasi dengan tabel users
+            // Relasi dengan tabel users
             $table->foreignId('user_id')
-                  ->nullable()
-                  ->constrained('users')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
 
-            //Informasi laporan progress
+            // Informasi laporan progress
             $table->date('tanggal_laporan');
             $table->decimal('persentase_progress', 5, 2);
 
-            //Detail pekerjaan
+            // Detail pekerjaan
             $table->text('uraian_pekerjaan');
             $table->text('kendala')->nullable();
             $table->text('solusi')->nullable();
             $table->text('catatan')->nullable();
             $table->string('rencana_selanjutnya')->nullable();
 
-            //Timestamp
+            // Timestamp
             $table->timestamps();
 
-            //Index pencarian proyek dan tanggal
+            // Index pencarian proyek dan tanggal
             $table->index(['proyek_id', 'tanggal_laporan']);
 
         });

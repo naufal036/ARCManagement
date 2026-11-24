@@ -38,7 +38,7 @@ class SystemConfigController extends Controller
 
         ActivityLog::record(
             'Update Pengaturan Sistem',
-            'Mengubah nama aplikasi menjadi "' . $request->app_name . '".',
+            'Mengubah nama aplikasi menjadi "'.$request->app_name.'".',
             $config
         );
 

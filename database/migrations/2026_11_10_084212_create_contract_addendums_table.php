@@ -20,9 +20,9 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('contract_id')
-                  ->references('id')
-                  ->on('contracts')
-                  ->cascadeOnDelete();
+                ->references('id')
+                ->on('contracts')
+                ->cascadeOnDelete();
         });
     }
 

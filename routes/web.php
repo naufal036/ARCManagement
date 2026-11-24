@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContractAddendumController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DokumenProyekController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\LaporanDokumentasiController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgressProyekController;
 use App\Http\Controllers\ProjectAssignmentController;
+use App\Http\Controllers\ProjectTaskController;
 use App\Http\Controllers\ProyekController;
 use App\Http\Controllers\SystemConfigController;
 use App\Http\Controllers\UserController;
@@ -75,17 +77,17 @@ Route::middleware('auth')->group(function () {
         ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
 
     // ===== Kontrak & Assignment =====
-    Route::get('contract/{contract}/file', [\App\Http\Controllers\ContractController::class, 'download'])
+    Route::get('contract/{contract}/file', [ContractController::class, 'download'])
         ->name('contract.file.download');
-    Route::post('contract/{contract}/addendums', [\App\Http\Controllers\ContractAddendumController::class, 'store'])
+    Route::post('contract/{contract}/addendums', [ContractAddendumController::class, 'store'])
         ->name('contract.addendums.store');
-    Route::put('contract/{contract}/addendums/{contractAddendum}', [\App\Http\Controllers\ContractAddendumController::class, 'update'])
+    Route::put('contract/{contract}/addendums/{contractAddendum}', [ContractAddendumController::class, 'update'])
         ->name('contract.addendums.update');
-    Route::delete('contract/{contract}/addendums/{contractAddendum}', [\App\Http\Controllers\ContractAddendumController::class, 'destroy'])
+    Route::delete('contract/{contract}/addendums/{contractAddendum}', [ContractAddendumController::class, 'destroy'])
         ->name('contract.addendums.destroy');
-    Route::get('contract/{contract}/addendums/{contractAddendum}/file', [\App\Http\Controllers\ContractAddendumController::class, 'download'])
+    Route::get('contract/{contract}/addendums/{contractAddendum}/file', [ContractAddendumController::class, 'download'])
         ->name('contract.addendums.file.download');
-    Route::resource('project-task', \App\Http\Controllers\ProjectTaskController::class);
+    Route::resource('project-task', ProjectTaskController::class);
 });
 
 require __DIR__.'/auth.php';

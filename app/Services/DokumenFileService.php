@@ -57,6 +57,7 @@ class DokumenFileService
                 Log::error('Baris manifest cleanup dokumen tidak valid dan dipertahankan.', [
                     'raw' => $record['raw'],
                 ]);
+
                 continue;
             }
 
@@ -65,6 +66,7 @@ class DokumenFileService
                 Log::error('Entri manifest cleanup dokumen tidak aman dan dipertahankan.', [
                     'entry' => $entry,
                 ]);
+
                 continue;
             }
 
