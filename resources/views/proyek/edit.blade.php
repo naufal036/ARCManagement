@@ -1,72 +1,114 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Edit Proyek') }}</h2>
+        <div>
+            <p class="text-sm font-medium text-[#0F766E]">Data Induk Proyek · {{ $proyek->kode_proyek }}</p>
+            <h2 class="text-2xl font-bold tracking-tight text-[#0A2342]">Edit Proyek</h2>
+        </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="bg-white shadow sm:rounded-lg p-4 sm:p-8 border border-gray-200">
-                <form action="{{ route('proyek.update', $proyek) }}" method="POST" enctype="multipart/form-data">@csrf @method('PUT')
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <x-input-label for="kode_proyek" value="{{ __('Kode Proyek') }}" />
-                            <x-text-input id="kode_proyek" name="kode_proyek" type="text" required autofocus value="{{ old('kode_proyek', $proyek->kode_proyek) }}" />
-                            <x-input-error :messages="$errors->get('kode_proyek')" class="mt-2" />
-                        </div>
-                        <div class="md:col-span-2">
-                            <x-input-label for="nama_proyek" value="{{ __('Nama Proyek') }}" />
-                            <x-text-input id="nama_proyek" name="nama_proyek" type="text" required value="{{ old('nama_proyek', $proyek->nama_proyek) }}" />
-                            <x-input-error :messages="$errors->get('nama_proyek')" class="mt-2" />
-                        </div>
-                        <div>
-                            <x-input-label for="klien_id" value="{{ __('Klien') }}" />
-                            <select id="klien_id" name="klien_id" required class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"><option value="">{{ __('Pilih Klien') }}</option>@foreach ($klien as $item)<option value="{{ $item->id }}" {{ old('klien_id', $proyek->klien_id) == $item->id ? 'selected' : '' }}>{{ $item->nama_klien }}</option>@endforeach</select>
-                            <x-input-error :messages="$errors->get('klien_id')" class="mt-2" />
-                        </div>
-                        <div>
-                            <x-input-label for="jenis_pekerjaan_id" value="{{ __('Jenis Pekerjaan') }}" />
-                            <select id="jenis_pekerjaan_id" name="jenis_pekerjaan_id" required class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"><option value="">{{ __('Pilih Jenis Pekerjaan') }}</option>@foreach ($jenisPekerjaan as $item)<option value="{{ $item->id }}" {{ old('jenis_pekerjaan_id', $proyek->jenis_pekerjaan_id) == $item->id ? 'selected' : '' }}>{{ $item->nama_pekerjaan }}</option>@endforeach</select>
-                            <x-input-error :messages="$errors->get('jenis_pekerjaan_id')" class="mt-2" />
-                        </div>
-                        <div>
-                            <x-input-label for="tanggal_mulai" value="{{ __('Tanggal Mulai') }}" />
-                            <x-text-input id="tanggal_mulai" name="tanggal_mulai" type="date" required value="{{ old('tanggal_mulai', $proyek->tanggal_mulai) }}" />
-                            <x-input-error :messages="$errors->get('tanggal_mulai')" class="mt-2" />
-                        </div>
-                        <div>
-                            <x-input-label for="tanggal_selesai" value="{{ __('Tanggal Selesai') }}" />
-                            <x-text-input id="tanggal_selesai" name="tanggal_selesai" type="date" value="{{ old('tanggal_selesai', $proyek->tanggal_selesai) }}" />
-                            <x-input-error :messages="$errors->get('tanggal_selesai')" class="mt-2" />
-                        </div>
-                        <div class="md:col-span-2">
-                            <x-input-label for="deskripsi" value="{{ __('Deskripsi') }}" />
-                            <textarea id="deskripsi" name="deskripsi" rows="3" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('deskripsi', $proyek->deskripsi) }}</textarea>
-                            <x-input-error :messages="$errors->get('deskripsi')" class="mt-2" />
-                        </div>
-                        <div class="md:col-span-2"><x-input-label for="cover_image" value="{{ __('Foto Sampul Project') }}" />@if ($proyek->cover_image_path)<div class="mt-2 flex items-center gap-4"><img src="{{ asset('storage/'.$proyek->cover_image_path) }}" alt="Foto sampul {{ $proyek->nama_proyek }}" class="h-24 w-40 rounded-xl object-cover"><button type="submit" form="remove-cover-form" class="text-sm font-semibold text-red-600">Hapus foto</button></div>@endif<input id="cover_image" name="cover_image" type="file" accept=".jpg,.jpeg,.png,.webp" class="mt-2 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500" /><p class="mt-1 text-xs text-gray-500">Upload foto baru untuk mengganti foto lama. Maksimal 5 MB.</p><x-input-error :messages="$errors->get('cover_image')" class="mt-2" /></div>
-                        <div>
-                            <x-input-label for="status" value="{{ __('Status') }}" />
-                            <select id="status" name="status" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                <option value="Perencanaan" {{ old('status', $proyek->status) == 'Perencanaan' ? 'selected' : '' }}>{{ __('Perencanaan') }}</option>
-                                <option value="Proses" {{ old('status', $proyek->status) == 'Proses' ? 'selected' : '' }}>{{ __('Proses') }}</option>
-                                <option value="Selesai" {{ old('status', $proyek->status) == 'Selesai' ? 'selected' : '' }}>{{ __('Selesai') }}</option>
-                                <option value="Ditunda" {{ old('status', $proyek->status) == 'Ditunda' ? 'selected' : '' }}>{{ __('Ditunda') }}</option>
-                                <option value="Batal" {{ old('status', $proyek->status) == 'Batal' ? 'selected' : '' }}>{{ __('Batal') }}</option>
-                            </select>
-                            <x-input-error :messages="$errors->get('status')" class="mt-2" />
-                        </div>
+    <div class="px-4 py-6 sm:px-6 lg:px-8">
+        <form action="{{ route('proyek.update', $proyek) }}" method="POST" enctype="multipart/form-data" class="mx-auto max-w-5xl space-y-6">
+            @csrf
+            @method('PUT')
+            <section class="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)] sm:p-7">
+                <div class="mb-6 border-b border-[#E3E8EF] pb-4">
+                    <h3 class="font-bold text-[#0A2342]">Identitas Proyek</h3>
+                    <p class="mt-1 text-sm text-[#5B6B80]">Data proyek ini juga digunakan oleh kontrak, penugasan, dokumen, dan progress.</p>
+                </div>
+                <div class="grid gap-5 md:grid-cols-2">
+                    <div>
+                        <x-input-label for="kode_proyek" value="Kode Proyek" />
+                        <x-text-input id="kode_proyek" name="kode_proyek" type="text" required maxlength="30" class="mt-1 block min-h-11 w-full rounded-xl border-[#D7DFE8] focus:border-[#14B8A6] focus:ring-[#14B8A6]" value="{{ old('kode_proyek', $proyek->kode_proyek) }}" />
+                        <x-input-error :messages="$errors->get('kode_proyek')" class="mt-2" />
                     </div>
-
-                    <div class="flex items-center gap-4 pt-6">
-                        <x-primary-button>{{ __('Perbarui Proyek') }}</x-primary-button>
-                        <a href="{{ route('proyek.index') }}" class="px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">{{ __('Kembali') }}</a>
+                    <div>
+                        <x-input-label for="status" value="Status Proyek" />
+                        <select id="status" name="status" required class="mt-1 block min-h-11 w-full rounded-xl border-[#D7DFE8] text-sm focus:border-[#14B8A6] focus:ring-[#14B8A6]">
+                            @if (! in_array($proyek->status, ['Perencanaan', 'Proses', 'Selesai', 'Ditunda', 'Batal'], true))
+                                <option value="{{ $proyek->status }}" selected>{{ $proyek->status }}</option>
+                            @endif
+                            @foreach (['Perencanaan', 'Proses', 'Selesai', 'Ditunda', 'Batal'] as $status)
+                                <option value="{{ $status }}" @selected(old('status', $proyek->status) === $status)>{{ $status }}</option>
+                            @endforeach
+                        </select>
+                        <x-input-error :messages="$errors->get('status')" class="mt-2" />
                     </div>
-                </form>
-                @if ($proyek->cover_image_path)
-                    <form id="remove-cover-form" method="POST" action="{{ route('proyek.cover.destroy', $proyek) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">@csrf @method('DELETE')</form>
-                @endif
+                    <div class="md:col-span-2">
+                        <x-input-label for="nama_proyek" value="Nama Proyek" />
+                        <x-text-input id="nama_proyek" name="nama_proyek" type="text" required maxlength="150" class="mt-1 block min-h-11 w-full rounded-xl border-[#D7DFE8] focus:border-[#14B8A6] focus:ring-[#14B8A6]" value="{{ old('nama_proyek', $proyek->nama_proyek) }}" />
+                        <x-input-error :messages="$errors->get('nama_proyek')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="klien_id" value="Klien" />
+                        <select id="klien_id" name="klien_id" required class="mt-1 block min-h-11 w-full rounded-xl border-[#D7DFE8] text-sm focus:border-[#14B8A6] focus:ring-[#14B8A6]">
+                            @foreach ($klien as $item)
+                                <option value="{{ $item->id }}" @selected((string) old('klien_id', $proyek->klien_id) === (string) $item->id)>{{ $item->nama_klien }}</option>
+                            @endforeach
+                        </select>
+                        <x-input-error :messages="$errors->get('klien_id')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="jenis_pekerjaan_id" value="Jenis Pekerjaan" />
+                        <select id="jenis_pekerjaan_id" name="jenis_pekerjaan_id" required class="mt-1 block min-h-11 w-full rounded-xl border-[#D7DFE8] text-sm focus:border-[#14B8A6] focus:ring-[#14B8A6]">
+                            @foreach ($jenisPekerjaan as $item)
+                                <option value="{{ $item->id }}" @selected((string) old('jenis_pekerjaan_id', $proyek->jenis_pekerjaan_id) === (string) $item->id)>{{ $item->nama_pekerjaan }}</option>
+                            @endforeach
+                        </select>
+                        <x-input-error :messages="$errors->get('jenis_pekerjaan_id')" class="mt-2" />
+                    </div>
+                </div>
+            </section>
+
+            <section class="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)] sm:p-7">
+                <div class="mb-6 border-b border-[#E3E8EF] pb-4">
+                    <h3 class="font-bold text-[#0A2342]">Jadwal, Anggaran & Foto Sampul</h3>
+                </div>
+                <div class="grid gap-5 md:grid-cols-2">
+                    <div>
+                        <x-input-label for="tanggal_mulai" value="Tanggal Mulai" />
+                        <x-text-input id="tanggal_mulai" name="tanggal_mulai" type="date" required class="mt-1 block min-h-11 w-full rounded-xl border-[#D7DFE8] focus:border-[#14B8A6] focus:ring-[#14B8A6]" value="{{ old('tanggal_mulai', $proyek->tanggal_mulai?->format('Y-m-d')) }}" />
+                        <x-input-error :messages="$errors->get('tanggal_mulai')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="tanggal_selesai" value="Target Penyelesaian" />
+                        <x-text-input id="tanggal_selesai" name="tanggal_selesai" type="date" class="mt-1 block min-h-11 w-full rounded-xl border-[#D7DFE8] focus:border-[#14B8A6] focus:ring-[#14B8A6]" value="{{ old('tanggal_selesai', $proyek->tanggal_selesai?->format('Y-m-d')) }}" />
+                        <x-input-error :messages="$errors->get('tanggal_selesai')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="anggaran" value="Anggaran Proyek (Rp)" />
+                        <x-text-input id="anggaran" name="anggaran" type="number" min="0" step="0.01" inputmode="decimal" class="mt-1 block min-h-11 w-full rounded-xl border-[#D7DFE8] focus:border-[#14B8A6] focus:ring-[#14B8A6]" value="{{ old('anggaran', $proyek->anggaran) }}" />
+                        <x-input-error :messages="$errors->get('anggaran')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="cover_image" value="Foto Sampul Proyek" />
+                        @if ($proyek->cover_image_path)
+                            <div class="mt-2 mb-3 flex items-center gap-4">
+                                <img src="{{ asset('storage/'.$proyek->cover_image_path) }}" alt="Foto sampul {{ $proyek->nama_proyek }}" class="h-20 w-32 rounded-xl object-cover">
+                                <button type="submit" form="remove-cover-form" class="text-xs font-semibold text-red-600 hover:text-red-800">Hapus foto sampul</button>
+                            </div>
+                        @endif
+                        <input id="cover_image" name="cover_image" type="file" accept=".jpg,.jpeg,.png,.webp" class="mt-1 block w-full rounded-xl border border-[#D7DFE8] p-2 text-sm text-[#43546A] file:mr-4 file:rounded-lg file:border-0 file:bg-[#EEF3F8] file:px-4 file:py-2 file:text-xs file:font-semibold file:text-[#0A2342] hover:file:bg-[#E2E8F0]" />
+                        <p class="mt-1 text-xs text-[#718096]">Upload file baru untuk mengganti foto saat ini. Maksimal 5 MB.</p>
+                        <x-input-error :messages="$errors->get('cover_image')" class="mt-2" />
+                    </div>
+                    <div class="md:col-span-2">
+                        <x-input-label for="deskripsi" value="Deskripsi Proyek" />
+                        <textarea id="deskripsi" name="deskripsi" rows="4" class="mt-1 block w-full rounded-xl border-[#D7DFE8] text-sm focus:border-[#14B8A6] focus:ring-[#14B8A6]">{{ old('deskripsi', $proyek->deskripsi) }}</textarea>
+                        <x-input-error :messages="$errors->get('deskripsi')" class="mt-2" />
+                    </div>
+                </div>
+            </section>
+            <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <a href="{{ route('proyek.show', $proyek) }}" class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#D7DFE8] px-5 text-sm font-semibold text-[#43546A] hover:bg-[#F5F8FA]">Batal</a>
+                <button type="submit" class="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#0F766E] px-5 text-sm font-semibold text-white hover:bg-[#115E59]">Simpan Perubahan</button>
             </div>
-        </div>
+        </form>
+
+        @if ($proyek->cover_image_path)
+            <form id="remove-cover-form" method="POST" action="{{ route('proyek.cover.destroy', $proyek) }}" onsubmit="return confirm('Hapus foto sampul proyek ini?');">
+                @csrf
+                @method('DELETE')
+            </form>
+        @endif
     </div>
 </x-app-layout>

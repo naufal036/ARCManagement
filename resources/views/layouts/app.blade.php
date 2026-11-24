@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>{{ config('app.name', 'ARCManagement') }}</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo1.png') }}">
 
@@ -25,25 +27,28 @@
         @include('layouts.navigation')
 
         <div class="app-main" :class="sidebarCollapsed ? 'app-main--collapsed' : ''">
-            @if (isset($header))
+            @isset($header)
                 <header class="border-b border-[#E3E8EF] bg-white">
                     <div class="px-4 py-5 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
                 </header>
-            @elseif (View::hasSection('header'))
-                <header class="border-b border-[#E3E8EF] bg-white">
-                    <div class="px-4 py-5 sm:px-6 lg:px-8">
-                        <h2 class="text-xl font-semibold leading-tight text-[#0F1B2D]">
+            @else
+                @hasSection('header')
+                    <header class="border-b border-[#E3E8EF] bg-white">
+                        <div class="px-4 py-5 sm:px-6 lg:px-8">
                             @yield('header')
-                        </h2>
-                    </div>
-                </header>
-            @endif
+                        </div>
+                    </header>
+                @endif
+            @endisset
 
-            <main class="p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">
-                {{ $slot ?? '' }}
-                @yield('content')
+            <main class="p-4 pb-24 sm:p-6 lg:p-8 lg:pb-8">
+                @isset($slot)
+                    {{ $slot }}
+                @else
+                    @yield('content')
+                @endisset
             </main>
         </div>
     </div>

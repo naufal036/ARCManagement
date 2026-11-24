@@ -16,12 +16,13 @@
             <svg class="pointer-events-none absolute bottom-0 right-4 hidden h-52 w-[28rem] text-[#2563EB]/40 lg:block" viewBox="0 0 448 210" fill="none" aria-hidden="true"><path d="M30 210V88l78-42v164M108 210V34l78-30v206M186 210V70l78-34v174M264 210V18l78 30v162M342 210V90l76-40v160" stroke="currentColor" stroke-width="3"/><path d="M58 108h20M58 132h20M58 156h20M136 64h20M136 88h20M136 112h20M214 96h20M214 120h20M292 62h20M292 86h20M370 112h20M370 136h20" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
         </section>
 
-        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             @foreach ([
                 ['label' => 'Total Proyek', 'value' => $totalProyek, 'route' => 'proyek.index', 'tone' => 'navy', 'icon' => 'M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
+                ['label' => 'Total Klien', 'value' => $totalKlien, 'route' => 'klien.index', 'tone' => 'teal', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8'],
+                ['label' => 'Total Kontrak', 'value' => $totalKontrak, 'route' => 'contract.index', 'tone' => 'blue', 'icon' => 'M6 3h9l3 3v15H6z M15 3v4h4 M9 12h6 M9 16h6'],
                 ['label' => 'Total Dokumen', 'value' => $totalDokumen, 'route' => 'dokumen-proyek.index', 'tone' => 'teal', 'icon' => 'M6 3h8l4 4v14H6z M14 3v5h5 M9 13h6'],
-                ['label' => 'Active Projects', 'value' => $proyekAktif, 'route' => 'proyek.index', 'tone' => 'blue', 'icon' => 'M3 12h4l2-5 4 10 2-5h6'],
-                ['label' => 'Team Members', 'value' => $totalAnggota, 'route' => 'project-assignment.index', 'tone' => 'amber', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M17 11h4'],
+                ['label' => 'Laporan Progress', 'value' => $totalProgress, 'route' => 'progress-proyek.index', 'tone' => 'amber', 'icon' => 'M3 3v18h18 M7 14l4-4 4 3 6-7'],
             ] as $stat)
                 <a href="{{ route($stat['route']) }}" class="group rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)] transition hover:-translate-y-0.5 hover:shadow-lg">
                     <div class="flex items-start justify-between gap-4">
@@ -33,10 +34,30 @@
                             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="{{ $stat['icon'] }}" /></svg>
                         </span>
                     </div>
-                    <p class="mt-5 text-xs font-semibold text-[#2563EB] group-hover:text-[#172B4D]">Open module <span aria-hidden="true">→</span></p>
+                    <p class="mt-5 text-xs font-semibold text-[#2563EB] group-hover:text-[#172B4D]">Buka modul <span aria-hidden="true">→</span></p>
                 </a>
             @endforeach
         </div>
+
+        <section class="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)] sm:p-6">
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <h3 class="font-bold text-[#0A2342]">Ringkasan Data Proyek</h3>
+                    <p class="mt-1 text-xs text-[#5B6B80]">Jumlah proyek pada setiap status saat ini.</p>
+                </div>
+                <a href="{{ route('proyek.index') }}" class="text-sm font-semibold text-[#0F766E] hover:text-[#0A2342]">Buka daftar proyek</a>
+            </div>
+            <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                @forelse ($jumlahProyekPerStatus as $status)
+                    <div class="rounded-xl border border-[#E3E8EF] bg-[#F8FAFC] px-4 py-3">
+                        <p class="text-xs font-medium text-[#5B6B80]">{{ $status->status }}</p>
+                        <p class="mt-1 text-2xl font-bold text-[#0A2342]">{{ number_format($status->total) }}</p>
+                    </div>
+                @empty
+                    <p class="text-sm text-[#5B6B80]">Belum ada data proyek.</p>
+                @endforelse
+            </div>
+        </section>
 
         <div class="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
             <section class="rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_24px_rgba(15,27,45,0.05)]">
@@ -52,7 +73,7 @@
                         <a href="{{ route('proyek.show', $proyek) }}" class="flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-[#F5F8FA] sm:px-6">
                             <div class="min-w-0">
                                 <p class="truncate text-sm font-semibold text-[#0F1B2D]">{{ $proyek->nama_proyek }}</p>
-                        <p class="mt-1 truncate text-xs text-[#64748B]">{{ $proyek->kode_proyek }} · {{ $proyek->klien?->nama_klien ?? 'Tanpa klien' }}</p>
+                                <p class="mt-1 truncate text-xs text-[#64748B]">{{ $proyek->kode_proyek }} · {{ $proyek->klien?->nama_klien ?? 'Tanpa klien' }}</p>
                                 <div class="mt-3 flex items-center gap-3"><div class="h-1.5 flex-1 overflow-hidden rounded-full bg-[#E2E8F0]"><div class="h-full rounded-full bg-[#2563EB]" style="width: {{ min((int) ($proyek->progress_proyek_max_persentase_progress ?? 0), 100) }}%"></div></div><span class="text-[11px] font-semibold text-[#64748B]">{{ (int) ($proyek->progress_proyek_max_persentase_progress ?? 0) }}%</span></div>
                             </div>
                             <span class="shrink-0 rounded-full bg-[#EFF6FF] px-3 py-1 text-xs font-semibold text-[#2563EB]">{{ $proyek->status }}</span>
