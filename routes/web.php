@@ -40,7 +40,11 @@ Route::middleware('auth')->group(function () {
     // Data Master & Operasional Proyek
     Route::resource('klien', KlienController::class);
     Route::resource('jenis-pekerjaan', JenisPekerjaanController::class);
+    Route::post('jenis-pekerjaan/{jenisPekerjaan}/toggle', [JenisPekerjaanController::class, 'toggle'])
+        ->name('jenis-pekerjaan.toggle');
     Route::resource('proyek', ProyekController::class);
+    Route::delete('proyek/{proyek}/cover', [ProyekController::class, 'removeCover'])
+        ->name('proyek.cover.destroy');
     Route::resource('contract', ContractController::class);
     Route::resource('project-assignment', ProjectAssignmentController::class);
 

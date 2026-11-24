@@ -21,6 +21,12 @@
                             @case('jenis-pekerjaan-deleted')
                                 {{ __('Data jenis pekerjaan berhasil dihapus.') }}
                                 @break
+                            @case('jenis-pekerjaan-deactivated')
+                                {{ __('Jenis pekerjaan digunakan proyek, sehingga dinonaktifkan untuk menjaga riwayat.') }}
+                                @break
+                            @case('jenis-pekerjaan-toggled')
+                                {{ __('Status jenis pekerjaan berhasil diperbarui.') }}
+                                @break
                         @endswitch
                     </div>
                 </div>
@@ -44,6 +50,7 @@
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Nama Pekerjaan') }}</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Deskripsi') }}</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Status') }}</th>
                                 <th scope="col" class="relative px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('Aksi') }}</th>
                             </tr>
                         </thead>
@@ -52,8 +59,10 @@
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item->nama_pekerjaan }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->deskripsi ?? '-' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap"><span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $item->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600' }}">{{ $item->is_active ? 'Aktif' : 'Nonaktif' }}</span><span class="ml-2 text-xs text-gray-500">{{ $item->proyek_count }} proyek</span></td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <a href="{{ route('jenis-pekerjaan.edit', $item) }}" class="text-indigo-600 hover:text-indigo-900">{{ __('Edit') }}</a>
+                                        <form action="{{ route('jenis-pekerjaan.toggle', $item) }}" method="POST" class="inline-block ml-3">@csrf<button type="submit" class="text-blue-600 hover:text-blue-900">{{ $item->is_active ? __('Nonaktifkan') : __('Aktifkan') }}</button></form>
                                         <form action="{{ route('jenis-pekerjaan.destroy', $item) }}" method="POST" class="inline-block">
                                             @csrf
                                             @method('DELETE')
@@ -65,7 +74,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="px-6 py-4 text-sm text-gray-500 text-center">{{ __('Belum ada data jenis pekerjaan.') }}</td>
+                                    <td colspan="4" class="px-6 py-4 text-sm text-gray-500 text-center">{{ __('Belum ada data jenis pekerjaan.') }}</td>
                                 </tr>
                             @endforelse
                         </tbody>

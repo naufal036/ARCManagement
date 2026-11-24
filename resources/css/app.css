@@ -4,16 +4,16 @@
 
 @layer base {
     :root {
-        --arc-primary-navy: #0A2342;
-        --arc-deep-blue: #123B63;
-        --arc-mid-blue: #2A6F97;
-        --arc-soft-tint: #E6F4F3;
-        --arc-accent-teal: #14B8A6;
-        --arc-background: #F5F8FA;
+        --arc-primary-navy: #172B4D;
+        --arc-deep-blue: #243B5A;
+        --arc-mid-blue: #2563EB;
+        --arc-soft-tint: #EFF6FF;
+        --arc-accent-teal: #2563EB;
+        --arc-background: #F4F7FB;
         --arc-surface: #FFFFFF;
-        --arc-primary-text: #0F1B2D;
-        --arc-secondary-text: #5B6B80;
-        --arc-border: #E3E8EF;
+        --arc-primary-text: #1E293B;
+        --arc-secondary-text: #64748B;
+        --arc-border: #E2E8F0;
     }
 
     body {
@@ -32,11 +32,11 @@
     }
 
     .app-sidebar {
-        width: 250px;
+        width: 264px;
     }
 
     .app-topbar {
-        margin-inline-start: 250px;
+        margin-inline-start: 264px;
         transition: margin-inline-start 200ms ease;
     }
 
@@ -46,7 +46,7 @@
 
     .app-main {
         min-height: 100vh;
-        margin-inline-start: 250px;
+        margin-inline-start: 264px;
         transition: margin-inline-start 200ms ease;
     }
 
@@ -67,5 +67,16 @@
         .app-sidebar--collapsed {
             width: 76px;
         }
+    }
+
+    .arc-card {
+        border: 1px solid var(--arc-border);
+        border-radius: 1rem;
+        background: var(--arc-surface);
+        box-shadow: 0 8px 24px rgba(23, 43, 77, 0.06);
+    }
+
+    .arc-page {
+        background: var(--arc-background);
     }
 }

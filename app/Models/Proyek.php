@@ -18,8 +18,17 @@ class Proyek extends Model
         'tanggal_mulai',
         'tanggal_selesai',
         'deskripsi',
+        'cover_image_path',
         'status',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'tanggal_mulai' => 'date',
+            'tanggal_selesai' => 'date',
+        ];
+    }
 
     public function klien(): BelongsTo
     {

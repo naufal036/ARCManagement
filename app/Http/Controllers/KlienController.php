@@ -39,6 +39,8 @@ class KlienController extends Controller
     {
         $validated = $request->validate([
             'nama_klien' => ['required', 'string', 'max:150'],
+            'jenis_client' => ['required', 'in:Sekolah,Pemerintah,Swasta,Lainnya'],
+            'npsn' => ['nullable', 'string', 'max:20'],
             'alamat' => ['nullable', 'string'],
             'no_telepon' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:100'],
@@ -66,6 +68,8 @@ class KlienController extends Controller
     {
         $validated = $request->validate([
             'nama_klien' => ['required', 'string', 'max:150'],
+            'jenis_client' => ['required', 'in:Sekolah,Pemerintah,Swasta,Lainnya'],
+            'npsn' => ['nullable', 'string', 'max:20'],
             'alamat' => ['nullable', 'string'],
             'no_telepon' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:100'],

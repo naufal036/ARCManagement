@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\JenisPekerjaan;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
@@ -15,7 +16,7 @@ class JenisPekerjaanController extends Controller
     public function index(): View
     {
         return view('jenis-pekerjaan.index', [
-            'jenisPekerjaan' => JenisPekerjaan::latest()->paginate(10),
+            'jenisPekerjaan' => JenisPekerjaan::withCount('proyek')->latest()->paginate(10),
         ]);
     }
 
@@ -77,8 +78,21 @@ class JenisPekerjaanController extends Controller
      */
     public function destroy(JenisPekerjaan $jenisPekerjaan)
     {
+        if ($jenisPekerjaan->proyek()->exists()) {
+            $jenisPekerjaan->update(['is_active' => false]);
+
+            return Redirect::route('jenis-pekerjaan.index')->with('status', 'jenis-pekerjaan-deactivated');
+        }
+
         $jenisPekerjaan->delete();
 
         return Redirect::route('jenis-pekerjaan.index')->with('status', 'jenis-pekerjaan-deleted');
+    }
+
+    public function toggle(JenisPekerjaan $jenisPekerjaan): RedirectResponse
+    {
+        $jenisPekerjaan->update(['is_active' => ! $jenisPekerjaan->is_active]);
+
+        return Redirect::route('jenis-pekerjaan.index')->with('status', 'jenis-pekerjaan-toggled');
     }
 }
