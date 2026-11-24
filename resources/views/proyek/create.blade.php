@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             <div class="bg-white shadow sm:rounded-lg p-4 sm:p-8 border border-gray-200">
-                <form action="{{ route('proyek.store') }}" method="POST">
+                <form action="{{ route('proyek.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -62,6 +62,13 @@
                             <x-input-label for="deskripsi" value="{{ __('Deskripsi') }}" />
                             <textarea id="deskripsi" name="deskripsi" rows="3" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('deskripsi') }}</textarea>
                             <x-input-error :messages="$errors->get('deskripsi')" class="mt-2" />
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <x-input-label for="cover_image" value="{{ __('Foto Sampul Project (opsional)') }}" />
+                            <input id="cover_image" name="cover_image" type="file" accept=".jpg,.jpeg,.png,.webp" class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+                            <p class="mt-1 text-xs text-gray-500">JPG, PNG, atau WEBP. Maksimal 5 MB.</p>
+                            <x-input-error :messages="$errors->get('cover_image')" class="mt-2" />
                         </div>
 
                         <div>

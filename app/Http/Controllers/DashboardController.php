@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Contract;
-use App\Models\Klien;
+use App\Models\DokumenProyek;
 use App\Models\ProgressProyek;
 use App\Models\Proyek;
+use App\Models\User;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -14,10 +14,13 @@ class DashboardController extends Controller
     {
         return view('dashboard', [
             'totalProyek' => Proyek::count(),
-            'totalKlien' => Klien::count(),
-            'totalKontrak' => Contract::count(),
-            'totalProgress' => ProgressProyek::count(),
+            'totalDokumen' => DokumenProyek::count(),
+            'proyekAktif' => Proyek::query()
+                ->whereNotIn('status', ['Selesai', 'Batal'])
+                ->count(),
+            'totalAnggota' => User::count(),
             'proyekTerbaru' => Proyek::with('klien')
+                ->withMax('progressProyek', 'persentase_progress')
                 ->latest()
                 ->take(5)
                 ->get(),
