@@ -1,0 +1,223 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\DokumenProyek;
+use App\Models\KategoriDokumen;
+use App\Models\Proyek;
+use App\Models\ProjectAssignment;
+use App\Models\ProgressProyek;
+use App\Models\User;
+use App\Models\VersiDokumen;
+use App\Services\DokumenFileService;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+
+class DokumenProyekController extends Controller
+{
+    public function __construct(private readonly DokumenFileService $fileService) {}
+
+    public function index(Request $request): View
+    {
+        $user = $request->user();
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:150'],
+            'proyek_id' => ['nullable', 'integer', 'exists:proyek,id'],
+            'kategori_dokumen_id' => ['nullable', 'integer', 'exists:kategori_dokumen,id'],
+            'ekstensi' => ['nullable', 'string', 'max:20'],
+        ]);
+
+        $visibleDocuments = $this->visibleDocuments($user);
+        $query = (clone $visibleDocuments)
+            ->with(['proyek', 'kategoriDokumen', 'versiTerbaru.pengunggah'])
+            ->when($filters['search'] ?? null, fn (Builder $query, string $search) => $query->where('nama_dokumen', 'like', '%'.$search.'%'))
+            ->when($filters['proyek_id'] ?? null, fn (Builder $query, int $projectId) => $query->where('proyek_id', $projectId))
+            ->when($filters['kategori_dokumen_id'] ?? null, fn (Builder $query, int $categoryId) => $query->where('kategori_dokumen_id', $categoryId))
+            ->when($filters['ekstensi'] ?? null, fn (Builder $query, string $extension) => $query->whereHas('versiDokumen', fn (Builder $versionQuery) => $versionQuery->where('ekstensi', strtolower($extension))))
+            ->latest();
+
+        return view('dokumen-proyek.index', [
+            'dokumenProyek' => $query->paginate(12)->withQueryString(),
+            'proyeks' => $this->visibleProjects($user),
+            'progressProyek' => $this->visibleProgress($user),
+            'kategoriDokumen' => KategoriDokumen::query()->orderBy('nama_kategori')->get(),
+            'filters' => $filters,
+            'dmsSummary' => [
+                'documents' => (clone $visibleDocuments)->count(),
+                'categories' => $this->visibleCategories($user),
+                'versions' => VersiDokumen::query()
+                    ->whereHas('dokumenProyek', fn (Builder $documentQuery) => $this->applyVisibility($documentQuery, $user))
+                    ->count(),
+            ],
+            'recentDocuments' => (clone $visibleDocuments)
+                ->with(['proyek', 'versiTerbaru.pengunggah'])
+                ->latest()
+                ->limit(5)
+                ->get(),
+            'recentActivities' => VersiDokumen::query()
+                ->whereHas('dokumenProyek', fn (Builder $documentQuery) => $this->applyVisibility($documentQuery, $user))
+                ->with(['dokumenProyek.proyek', 'pengunggah'])
+                ->latest()
+                ->limit(5)
+                ->get(),
+        ]);
+    }
+
+    public function create(): View
+    {
+        return view('dokumen-proyek.create', [
+            'proyeks' => $this->visibleProjects(request()->user()),
+            'progressProyek' => $this->visibleProgress(request()->user()),
+            'kategoriDokumen' => KategoriDokumen::query()->orderBy('nama_kategori')->get(),
+        ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'proyek_id' => ['required', 'exists:proyek,id'],
+            'kategori_dokumen_id' => ['required', 'exists:kategori_dokumen,id'],
+            'progress_proyek_id' => ['nullable', 'exists:progress_proyek,id'],
+            'nama_dokumen' => ['required', 'string', 'max:150'],
+            'deskripsi' => ['nullable', 'string', 'max:5000'],
+        ]);
+
+        $project = Proyek::findOrFail($validated['proyek_id']);
+        Gate::authorize('create', [DokumenProyek::class, $project]);
+        $this->ensureProgressBelongsToProject($validated['progress_proyek_id'] ?? null, $project->getKey());
+
+        $document = DokumenProyek::create($validated);
+
+        return redirect()->route('dokumen-proyek.show', $document)->with('success', 'Dokumen proyek berhasil dibuat.');
+    }
+
+    public function show(DokumenProyek $dokumenProyek): View
+    {
+        Gate::authorize('view', $dokumenProyek);
+
+        return view('dokumen-proyek.show', [
+            'dokumenProyek' => $dokumenProyek->load([
+                'proyek',
+                'kategoriDokumen',
+                'progressProyek',
+                'versiDokumen.pengunggah',
+            ]),
+        ]);
+    }
+
+    public function edit(DokumenProyek $dokumenProyek): View
+    {
+        Gate::authorize('update', $dokumenProyek);
+
+        return view('dokumen-proyek.edit', [
+            'dokumenProyek' => $dokumenProyek,
+            'proyeks' => $this->visibleProjects(request()->user()),
+            'progressProyek' => $this->visibleProgress(request()->user()),
+            'kategoriDokumen' => KategoriDokumen::query()->orderBy('nama_kategori')->get(),
+        ]);
+    }
+
+    public function update(Request $request, DokumenProyek $dokumenProyek): RedirectResponse
+    {
+        Gate::authorize('update', $dokumenProyek);
+
+        $validated = $request->validate([
+            'proyek_id' => ['required', 'exists:proyek,id'],
+            'kategori_dokumen_id' => ['required', 'exists:kategori_dokumen,id'],
+            'progress_proyek_id' => ['nullable', 'exists:progress_proyek,id'],
+            'nama_dokumen' => ['required', 'string', 'max:150'],
+            'deskripsi' => ['nullable', 'string', 'max:5000'],
+        ]);
+
+        $project = Proyek::findOrFail($validated['proyek_id']);
+        Gate::authorize('create', [DokumenProyek::class, $project]);
+        $this->ensureProgressBelongsToProject($validated['progress_proyek_id'] ?? null, $project->getKey());
+        $dokumenProyek->update($validated);
+
+        return redirect()->route('dokumen-proyek.show', $dokumenProyek)->with('success', 'Dokumen proyek berhasil diperbarui.');
+    }
+
+    public function destroy(DokumenProyek $dokumenProyek): RedirectResponse
+    {
+        Gate::authorize('delete', $dokumenProyek);
+
+        $paths = $dokumenProyek->versiDokumen()->pluck('path_file')->all();
+
+        DB::transaction(fn () => $dokumenProyek->delete());
+
+        if ($paths !== [] && ! $this->fileService->cleanup('local', $paths)) {
+            return redirect()->route('dokumen-proyek.index')
+                ->with('error', 'Metadata terhapus, tetapi sebagian file gagal dibersihkan.');
+        }
+
+        return redirect()->route('dokumen-proyek.index')->with('success', 'Dokumen proyek berhasil dihapus.');
+    }
+
+    private function visibleProjects(User $user)
+    {
+        $query = Proyek::query()->orderBy('nama_proyek');
+
+        if (! $this->canManageAll($user)) {
+            $query->whereIn('id', ProjectAssignment::query()
+                ->where('user_id', $user->getKey())
+                ->select('project_id'));
+        }
+
+        return $query->get();
+    }
+
+    private function visibleDocuments(User $user): Builder
+    {
+        return $this->applyVisibility(DokumenProyek::query(), $user);
+    }
+
+    private function visibleProgress(User $user)
+    {
+        return ProgressProyek::query()
+            ->with('proyek')
+            ->whereIn('proyek_id', $this->visibleProjects($user)->pluck('id'))
+            ->latest('tanggal_laporan')
+            ->get();
+    }
+
+    private function applyVisibility(Builder $query, User $user): Builder
+    {
+        if (! $this->canManageAll($user)) {
+            $query->whereIn('proyek_id', ProjectAssignment::query()
+                ->where('user_id', $user->getKey())
+                ->select('project_id'));
+        }
+
+        return $query;
+    }
+
+    private function visibleCategories(User $user): int
+    {
+        $query = KategoriDokumen::query();
+
+        if (! $this->canManageAll($user)) {
+            $query->whereHas('dokumenProyek', fn (Builder $documentQuery) => $this->applyVisibility($documentQuery, $user));
+        }
+
+        return $query->count();
+    }
+
+    private function canManageAll(User $user): bool
+    {
+        return in_array($user->role?->nama_role, ['Admin', 'Direktur'], true);
+    }
+
+    private function ensureProgressBelongsToProject(?int $progressId, int $projectId): void
+    {
+        if ($progressId !== null && ! \App\Models\ProgressProyek::query()
+            ->whereKey($progressId)
+            ->where('proyek_id', $projectId)
+            ->exists()) {
+            abort(422, 'Laporan progress tidak terkait dengan proyek yang dipilih.');
+        }
+    }
+}

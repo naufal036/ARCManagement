@@ -1,3 +1,71 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --arc-primary-navy: #0A2342;
+        --arc-deep-blue: #123B63;
+        --arc-mid-blue: #2A6F97;
+        --arc-soft-tint: #E6F4F3;
+        --arc-accent-teal: #14B8A6;
+        --arc-background: #F5F8FA;
+        --arc-surface: #FFFFFF;
+        --arc-primary-text: #0F1B2D;
+        --arc-secondary-text: #5B6B80;
+        --arc-border: #E3E8EF;
+    }
+
+    body {
+        background-color: var(--arc-background);
+        color: var(--arc-primary-text);
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@layer components {
+    .font-inter {
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    }
+
+    .app-sidebar {
+        width: 250px;
+    }
+
+    .app-topbar {
+        margin-inline-start: 250px;
+        transition: margin-inline-start 200ms ease;
+    }
+
+    .app-topbar--collapsed {
+        margin-inline-start: 76px;
+    }
+
+    .app-main {
+        min-height: 100vh;
+        margin-inline-start: 250px;
+        transition: margin-inline-start 200ms ease;
+    }
+
+    .app-main--collapsed {
+        margin-inline-start: 76px;
+    }
+
+    @media (max-width: 1023px) {
+        .app-topbar,
+        .app-topbar--collapsed,
+        .app-main,
+        .app-main--collapsed {
+            margin-inline-start: 0;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .app-sidebar--collapsed {
+            width: 76px;
+        }
+    }
+}

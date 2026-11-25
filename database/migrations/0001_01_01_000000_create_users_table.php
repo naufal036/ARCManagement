@@ -13,9 +13,13 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('role_id')->constrained('roles');
+            // Tambahkan foreign key untuk relasi ke tabel roles
+            $table->foreignId('role_id')->nullable()->constrained('roles')->nullOnDelete();
             $table->string('name');
             $table->string('email')->unique();
+            // Tambahkan phone dan status
+            $table->string('phone')->nullable();
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
