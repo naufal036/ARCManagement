@@ -9,7 +9,7 @@ class KategoriDokumenPolicy
 {
     public function before(User $user, string $ability): ?bool
     {
-        return in_array($user->role?->nama_role, ['Admin', 'Direktur'], true) ? true : null;
+        return in_array($user->role?->name, ['Admin', 'Direktur'], true) ? true : null;
     }
 
     public function viewAny(User $user): bool

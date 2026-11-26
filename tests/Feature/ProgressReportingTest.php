@@ -4,6 +4,7 @@ use App\Models\JenisPekerjaan;
 use App\Models\Klien;
 use App\Models\ProgressDokumentasi;
 use App\Models\ProgressProyek;
+use App\Models\ProjectAssignment;
 use App\Models\Proyek;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -37,6 +38,13 @@ beforeEach(function (): void {
         'tanggal_selesai' => '2026-12-31',
         'deskripsi' => 'Fixture untuk feature test Progress Reporting.',
         'status' => 'Berjalan',
+    ]);
+
+    ProjectAssignment::create([
+        'project_id' => $this->proyek->id,
+        'user_id' => $this->user->id,
+        'role_in_project' => 'Staf Teknis',
+        'assigned_date' => '2026-01-01',
     ]);
 });
 
@@ -263,4 +271,34 @@ it('filters the documentation report by project, date, and file name', function 
         ->assertSee($documentation->nama_file_asli)
         ->assertSee($progress->proyek->nama_proyek)
         ->assertSee('Dokumentasi filter.');
+});
+
+it('hides progress documentation from users without project access', function (): void {
+    $outsider = User::factory()->create(['email_verified_at' => now()]);
+    $progress = ProgressProyek::create(progressPayload($this->proyek->id) + [
+        'user_id' => $this->user->id,
+    ]);
+    $path = 'progress-dokumentasi/'.$progress->id.'/private.pdf';
+    Storage::disk('local')->put($path, '%PDF-1.4 private');
+    $documentation = ProgressDokumentasi::create([
+        'progress_proyek_id' => $progress->id,
+        'nama_file_asli' => 'private.pdf',
+        'path_file' => $path,
+    ]);
+
+    $this->actingAs($outsider)
+        ->get(route('laporan-dokumentasi.index'))
+        ->assertOk()
+        ->assertDontSee('private.pdf')
+        ->assertDontSee($this->proyek->nama_proyek);
+
+    $this->actingAs($outsider)
+        ->get(route('progress-proyek.dokumentasi.download', [$progress, $documentation]))
+        ->assertForbidden();
+
+    $this->actingAs($outsider)
+        ->post(route('progress-proyek.dokumentasi.store', $progress), [
+            'dokumentasi_file' => UploadedFile::fake()->create('blocked.pdf', 20, 'application/pdf'),
+        ])
+        ->assertForbidden();
 });

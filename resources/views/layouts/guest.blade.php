@@ -19,7 +19,7 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
 
-        @if (file_exists(public_path('images/logo.png')))
+        @if (file_exists(public_path('images/logo1.png')))
             <link rel="icon" type="image/png" href="{{ asset('images/logo1.png') }}">
         @endif
 

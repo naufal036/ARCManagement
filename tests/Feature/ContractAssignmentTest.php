@@ -1,10 +1,12 @@
 <?php
 
+use App\Models\ActivityLog;
 use App\Models\Contract;
 use App\Models\ContractAddendum;
 use App\Models\ProjectAssignment;
 use App\Models\ProjectTask;
 use App\Models\Proyek;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -110,6 +112,76 @@ it('rejects invalid contract dates, values, statuses, and duplicate numbers', fu
         ]))
         ->assertRedirect(route('contract.create'))
         ->assertSessionHasErrors(['contract_number', 'end_date', 'contract_value', 'status']);
+});
+
+it('rejects contract and addendum values beyond the database decimal range', function (): void {
+    $contract = Contract::create(contractAssignmentPayload($this->proyek->id));
+
+    $this->actingAs($this->user)
+        ->from(route('contract.create'))
+        ->post(route('contract.store'), contractAssignmentPayload($this->proyek->id, [
+            'contract_number' => 'KTR-TOO-LARGE',
+            'contract_value' => '10000000000000.00',
+        ]))
+        ->assertRedirect(route('contract.create'))
+        ->assertSessionHasErrors('contract_value');
+
+    $this->actingAs($this->user)
+        ->from(route('contract.show', $contract))
+        ->post(route('contract.addendums.store', $contract), addendumPayload([
+            'value_after' => '10000000000000.00',
+        ]))
+        ->assertRedirect(route('contract.show', $contract))
+        ->assertSessionHasErrors('value_after');
+
+    $this->assertDatabaseMissing('contracts', ['contract_number' => 'KTR-TOO-LARGE']);
+    $this->assertDatabaseMissing('contract_addendums', ['contract_id' => $contract->id]);
+});
+
+it('rejects contract and addendum values with excess decimal places', function (): void {
+    $contract = Contract::create(contractAssignmentPayload($this->proyek->id));
+
+    $this->actingAs($this->user)
+        ->from(route('contract.create'))
+        ->post(route('contract.store'), contractAssignmentPayload($this->proyek->id, [
+            'contract_number' => 'KTR-EXCESS-DECIMALS',
+            'contract_value' => '100,001',
+        ]))
+        ->assertRedirect(route('contract.create'))
+        ->assertSessionHasErrors('contract_value');
+
+    $this->actingAs($this->user)
+        ->from(route('contract.show', $contract))
+        ->post(route('contract.addendums.store', $contract), addendumPayload([
+            'value_after' => '100.001',
+        ]))
+        ->assertRedirect(route('contract.show', $contract))
+        ->assertSessionHasErrors('value_after');
+});
+
+it('records activity using the application activity log schema', function (): void {
+    $contract = Contract::create(contractAssignmentPayload($this->proyek->id));
+
+    ActivityLog::record('Kontrak diperbarui', 'Data kontrak diperbarui.', $contract, $this->user->id);
+
+    $this->assertDatabaseHas('activity_logs', [
+        'user_id' => $this->user->id,
+        'activity' => 'Kontrak diperbarui',
+        'description' => 'Data kontrak diperbarui.',
+        'subject_type' => 'Contract',
+        'subject_id' => $contract->id,
+    ]);
+});
+
+it('restricts user administration and settings to admins', function (): void {
+    $adminRole = Role::create(['nama_role' => 'Admin']);
+    $admin = User::factory()->create(['role_id' => $adminRole->id]);
+
+    $this->actingAs($this->user)->get(route('users.index'))->assertForbidden();
+    $this->actingAs($this->user)->get(route('settings.index'))->assertForbidden();
+
+    $this->actingAs($admin)->get(route('users.index'))->assertOk();
+    $this->actingAs($admin)->get(route('settings.index'))->assertOk();
 });
 
 it('stores, downloads, replaces, and removes private contract files', function (): void {

@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\ProgressDokumentasi;
 use App\Models\ProgressProyek;
 use App\Models\Proyek;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 class ProgressProyekController extends Controller
 {
@@ -178,7 +179,6 @@ class ProgressProyekController extends Controller
             'catatan' => ['nullable', 'string'],
             'rencana_selanjutnya' => ['nullable', 'string'],
         ]);
-
         $progressProyek->update($validated);
 
         return redirect()
@@ -218,6 +218,8 @@ class ProgressProyekController extends Controller
 
     public function storeDocumentation(Request $request, ProgressProyek $progressProyek)
     {
+        Gate::authorize('uploadDocumentation', $progressProyek);
+
         $validated = $request->validate([
             'dokumentasi_file' => [
                 'required',
@@ -264,6 +266,7 @@ class ProgressProyekController extends Controller
         ProgressDokumentasi $dokumentasi
     ) {
         $this->ensureDocumentationBelongsToProgress($progressProyek, $dokumentasi);
+        Gate::authorize('viewDocumentation', $progressProyek);
 
         $disk = Storage::disk('local');
         abort_unless($disk->exists($dokumentasi->path_file), 404);
@@ -276,6 +279,7 @@ class ProgressProyekController extends Controller
         ProgressDokumentasi $dokumentasi
     ) {
         $this->ensureDocumentationBelongsToProgress($progressProyek, $dokumentasi);
+        Gate::authorize('viewDocumentation', $progressProyek);
 
         $disk = Storage::disk('local');
         abort_unless($disk->exists($dokumentasi->path_file), 404);
@@ -294,9 +298,12 @@ class ProgressProyekController extends Controller
         ProgressDokumentasi $dokumentasi
     ): void {
         abort_unless(
-            $dokumentasi->progress_proyek_id === $progressProyek->getKey(),
+            $dokumentasi->progress_proyek_id === $progressProyek->getKey()
+                && Str::startsWith(
+                    $dokumentasi->path_file,
+                    'progress-dokumentasi/'.$progressProyek->getKey().'/'
+                ),
             404
         );
     }
-
 }

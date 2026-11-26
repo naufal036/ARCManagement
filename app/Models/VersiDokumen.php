@@ -15,6 +15,7 @@ class VersiDokumen extends Model
     protected $fillable = [
         'dokumen_proyek_id',
         'nomor_versi',
+        'nama_file',
         'nama_file_asli',
         'nama_file_storage',
         'path_file',
@@ -26,6 +27,12 @@ class VersiDokumen extends Model
         'catatan',
         'user_id',
     ];
+
+    public function setNamaFileAsliAttribute(string $value): void
+    {
+        $this->attributes['nama_file_asli'] = $value;
+        $this->attributes['nama_file'] = $value;
+    }
 
     protected function casts(): array
     {

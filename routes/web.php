@@ -1,15 +1,20 @@
+
 <?php
 
+use App\Http\Controllers\ContractAddendumController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DokumenProyekController;
+use App\Http\Controllers\DokumenWorkflowController;
 use App\Http\Controllers\JenisPekerjaanController;
 use App\Http\Controllers\KategoriDokumenController;
 use App\Http\Controllers\KlienController;
+use App\Http\Controllers\LaporanArsipDokumenController;
 use App\Http\Controllers\LaporanDokumentasiController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgressProyekController;
 use App\Http\Controllers\ProjectAssignmentController;
+use App\Http\Controllers\ProjectTaskController;
 use App\Http\Controllers\ProyekController;
 use App\Http\Controllers\SystemConfigController;
 use App\Http\Controllers\UserController;
@@ -25,19 +30,10 @@ Route::get('/dashboard', DashboardController::class)
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    // Profil Pengguna
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Administrasi (Khusus Admin)
-    Route::middleware(['role:Admin'])->group(function () {
-        Route::resource('users', UserController::class);
-        Route::get('/settings', [SystemConfigController::class, 'index'])->name('settings.index');
-        Route::post('/settings', [SystemConfigController::class, 'update'])->name('settings.update');
-    });
-
-    // Data Master & Operasional Proyek
     Route::resource('klien', KlienController::class);
     Route::resource('jenis-pekerjaan', JenisPekerjaanController::class);
     Route::post('jenis-pekerjaan/{jenisPekerjaan}/toggle', [JenisPekerjaanController::class, 'toggle'])
@@ -46,25 +42,53 @@ Route::middleware('auth')->group(function () {
     Route::delete('proyek/{proyek}/cover', [ProyekController::class, 'removeCover'])
         ->name('proyek.cover.destroy');
     Route::resource('contract', ContractController::class);
+    Route::get('contract/{contract}/file', [ContractController::class, 'download'])
+        ->name('contract.file.download');
+    Route::post('contract/{contract}/addendums', [ContractAddendumController::class, 'store'])
+        ->name('contract.addendums.store');
+    Route::put('contract/{contract}/addendums/{contractAddendum}', [ContractAddendumController::class, 'update'])
+        ->name('contract.addendums.update');
+    Route::delete('contract/{contract}/addendums/{contractAddendum}', [ContractAddendumController::class, 'destroy'])
+        ->name('contract.addendums.destroy');
+    Route::get('contract/{contract}/addendums/{contractAddendum}/file', [ContractAddendumController::class, 'download'])
+        ->name('contract.addendums.file.download');
     Route::resource('project-assignment', ProjectAssignmentController::class);
-
-    // Document Management
+    Route::resource('project-task', ProjectTaskController::class);
+    Route::middleware('role:Admin')->group(function () {
+        Route::resource('users', UserController::class)
+            ->only(['index', 'create', 'store', 'edit', 'update']);
+        Route::get('settings', [SystemConfigController::class, 'index'])->name('settings.index');
+        Route::post('settings', [SystemConfigController::class, 'update'])->name('settings.update');
+    });
     Route::get('/laporan-dokumentasi', [LaporanDokumentasiController::class, 'index'])
         ->name('laporan-dokumentasi.index');
+
     Route::resource('kategori-dokumen', KategoriDokumenController::class)
         ->except(['show'])
         ->parameters(['kategori-dokumen' => 'kategoriDokumen']);
     Route::resource('dokumen-proyek', DokumenProyekController::class)
         ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'])
         ->parameters(['dokumen-proyek' => 'dokumenProyek']);
+    Route::post('dokumen-proyek/{dokumenProyek}/workflow/submit', [DokumenWorkflowController::class, 'submit'])
+        ->name('dokumen-proyek.workflow.submit');
+    Route::post('dokumen-proyek/{dokumenProyek}/workflow/review', [DokumenWorkflowController::class, 'review'])
+        ->name('dokumen-proyek.workflow.review');
+    Route::post('dokumen-proyek/{dokumenProyek}/workflow/finalize', [DokumenWorkflowController::class, 'finalize'])
+        ->name('dokumen-proyek.workflow.finalize');
     Route::post('dokumen-proyek/{dokumenProyek}/versi', [VersiDokumenController::class, 'store'])
         ->name('dokumen-proyek.versi.store');
     Route::get('versi-dokumen/{versiDokumen}/view', [VersiDokumenController::class, 'view'])
         ->name('versi-dokumen.view');
     Route::get('versi-dokumen/{versiDokumen}/download', [VersiDokumenController::class, 'download'])
         ->name('versi-dokumen.download');
+    Route::get('laporan-arsip-dokumen', [LaporanArsipDokumenController::class, 'index'])
+        ->name('laporan-arsip-dokumen.index');
+    Route::get('laporan-arsip-dokumen/export/excel', [LaporanArsipDokumenController::class, 'exportExcel'])
+        ->name('laporan-arsip-dokumen.export.xlsx');
+    Route::get('laporan-arsip-dokumen/export/pdf', [LaporanArsipDokumenController::class, 'exportPdf'])
+        ->name('laporan-arsip-dokumen.export.pdf');
 
-    // Progress Reporting & Dokumentasi Lapangan
+    // Preview sementara - hanya untuk development - ongoing.
     Route::post('progress-proyek/{progress_proyek}/dokumentasi', [ProgressProyekController::class, 'storeDocumentation'])
         ->name('progress-proyek.dokumentasi.store');
     Route::get('progress-proyek/{progress_proyek}/dokumentasi/{dokumentasi}/view', [ProgressProyekController::class, 'viewDocumentation'])
@@ -73,19 +97,6 @@ Route::middleware('auth')->group(function () {
         ->name('progress-proyek.dokumentasi.download');
     Route::resource('progress-proyek', ProgressProyekController::class)
         ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
-
-    // ===== Kontrak & Assignment =====
-    Route::get('contract/{contract}/file', [\App\Http\Controllers\ContractController::class, 'download'])
-        ->name('contract.file.download');
-    Route::post('contract/{contract}/addendums', [\App\Http\Controllers\ContractAddendumController::class, 'store'])
-        ->name('contract.addendums.store');
-    Route::put('contract/{contract}/addendums/{contractAddendum}', [\App\Http\Controllers\ContractAddendumController::class, 'update'])
-        ->name('contract.addendums.update');
-    Route::delete('contract/{contract}/addendums/{contractAddendum}', [\App\Http\Controllers\ContractAddendumController::class, 'destroy'])
-        ->name('contract.addendums.destroy');
-    Route::get('contract/{contract}/addendums/{contractAddendum}/file', [\App\Http\Controllers\ContractAddendumController::class, 'download'])
-        ->name('contract.addendums.file.download');
-    Route::resource('project-task', \App\Http\Controllers\ProjectTaskController::class);
 });
 
 require __DIR__.'/auth.php';

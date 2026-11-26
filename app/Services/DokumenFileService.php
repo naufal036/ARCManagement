@@ -57,6 +57,7 @@ class DokumenFileService
                 Log::error('Baris manifest cleanup dokumen tidak valid dan dipertahankan.', [
                     'raw' => $record['raw'],
                 ]);
+
                 continue;
             }
 
@@ -65,6 +66,7 @@ class DokumenFileService
                 Log::error('Entri manifest cleanup dokumen tidak aman dan dipertahankan.', [
                     'entry' => $entry,
                 ]);
+
                 continue;
             }
 
@@ -148,7 +150,7 @@ class DokumenFileService
 
             $actualChecksum = hash_final($context);
 
-            if (! hash_equals((string) $version->checksum_sha256, $actualChecksum)) {
+            if ($version->checksum_sha256 !== null && ! hash_equals($version->checksum_sha256, $actualChecksum)) {
                 Log::warning('Checksum file dokumen tidak cocok.', [
                     'version_id' => $version->getKey(),
                     'path' => $version->path_file,

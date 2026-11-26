@@ -20,7 +20,7 @@ class CheckRole
         }
 
         // Ambil nama role user yang sedang login
-        $userRole = Auth::user()->role->name ?? '';
+        $userRole = Auth::user()->role?->name ?? '';
 
         // Cek apakah role user ada di dalam daftar role yang diizinkan ($roles)
         if (in_array($userRole, $roles)) {

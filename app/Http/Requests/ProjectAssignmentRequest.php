@@ -3,9 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Models\ProjectAssignment;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Database\Query\Builder;
 
 class ProjectAssignmentRequest extends FormRequest
 {
