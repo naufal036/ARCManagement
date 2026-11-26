@@ -47,7 +47,7 @@ class ContractRequest extends FormRequest
             'contract_date' => ['required', 'date'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after:start_date'],
-            'contract_value' => ['required', 'numeric', 'gt:0'],
+            'contract_value' => ['required', 'numeric', 'decimal:0,2', 'gt:0', 'max:9999999999999.99'],
             'status' => ['required', Rule::in(['draft', 'active', 'completed', 'terminated'])],
             'file_kontrak' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
         ];
@@ -71,7 +71,9 @@ class ContractRequest extends FormRequest
             'end_date.after' => 'Tanggal selesai harus setelah tanggal mulai.',
             'contract_value.required' => 'Nilai kontrak wajib diisi.',
             'contract_value.numeric' => 'Nilai kontrak harus berupa angka.',
+            'contract_value.decimal' => 'Nilai kontrak maksimal memiliki 2 angka desimal.',
             'contract_value.gt' => 'Nilai kontrak harus lebih besar dari 0.',
+            'contract_value.max' => 'Nilai kontrak tidak boleh melebihi 9.999.999.999.999,99.',
             'status.required' => 'Status kontrak wajib dipilih.',
             'status.in' => 'Status kontrak tidak valid.',
             'file_kontrak.file' => 'File kontrak tidak valid.',

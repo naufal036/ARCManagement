@@ -58,4 +58,4 @@ Route::middleware('auth')->group(function () {
 // Tambahkan di bagian paling bawah routes/auth.php
 Route::any('register', function () {
     return redirect()->route('login');
-});
+})->name('register');

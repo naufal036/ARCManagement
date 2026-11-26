@@ -1,22 +1,28 @@
 
 <?php
 
+use App\Http\Controllers\ContractAddendumController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DokumenProyekController;
+use App\Http\Controllers\DokumenWorkflowController;
 use App\Http\Controllers\JenisPekerjaanController;
 use App\Http\Controllers\KategoriDokumenController;
 use App\Http\Controllers\KlienController;
+use App\Http\Controllers\LaporanArsipDokumenController;
 use App\Http\Controllers\LaporanDokumentasiController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgressProyekController;
 use App\Http\Controllers\ProjectAssignmentController;
+use App\Http\Controllers\ProjectTaskController;
 use App\Http\Controllers\ProyekController;
+use App\Http\Controllers\SystemConfigController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VersiDokumenController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 Route::get('/dashboard', DashboardController::class)
@@ -36,7 +42,24 @@ Route::middleware('auth')->group(function () {
     Route::delete('proyek/{proyek}/cover', [ProyekController::class, 'removeCover'])
         ->name('proyek.cover.destroy');
     Route::resource('contract', ContractController::class);
+    Route::get('contract/{contract}/file', [ContractController::class, 'download'])
+        ->name('contract.file.download');
+    Route::post('contract/{contract}/addendums', [ContractAddendumController::class, 'store'])
+        ->name('contract.addendums.store');
+    Route::put('contract/{contract}/addendums/{contractAddendum}', [ContractAddendumController::class, 'update'])
+        ->name('contract.addendums.update');
+    Route::delete('contract/{contract}/addendums/{contractAddendum}', [ContractAddendumController::class, 'destroy'])
+        ->name('contract.addendums.destroy');
+    Route::get('contract/{contract}/addendums/{contractAddendum}/file', [ContractAddendumController::class, 'download'])
+        ->name('contract.addendums.file.download');
     Route::resource('project-assignment', ProjectAssignmentController::class);
+    Route::resource('project-task', ProjectTaskController::class);
+    Route::middleware('role:Admin')->group(function () {
+        Route::resource('users', UserController::class)
+            ->only(['index', 'create', 'store', 'edit', 'update']);
+        Route::get('settings', [SystemConfigController::class, 'index'])->name('settings.index');
+        Route::post('settings', [SystemConfigController::class, 'update'])->name('settings.update');
+    });
     Route::get('/laporan-dokumentasi', [LaporanDokumentasiController::class, 'index'])
         ->name('laporan-dokumentasi.index');
 
@@ -46,12 +69,24 @@ Route::middleware('auth')->group(function () {
     Route::resource('dokumen-proyek', DokumenProyekController::class)
         ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'])
         ->parameters(['dokumen-proyek' => 'dokumenProyek']);
+    Route::post('dokumen-proyek/{dokumenProyek}/workflow/submit', [DokumenWorkflowController::class, 'submit'])
+        ->name('dokumen-proyek.workflow.submit');
+    Route::post('dokumen-proyek/{dokumenProyek}/workflow/review', [DokumenWorkflowController::class, 'review'])
+        ->name('dokumen-proyek.workflow.review');
+    Route::post('dokumen-proyek/{dokumenProyek}/workflow/finalize', [DokumenWorkflowController::class, 'finalize'])
+        ->name('dokumen-proyek.workflow.finalize');
     Route::post('dokumen-proyek/{dokumenProyek}/versi', [VersiDokumenController::class, 'store'])
         ->name('dokumen-proyek.versi.store');
     Route::get('versi-dokumen/{versiDokumen}/view', [VersiDokumenController::class, 'view'])
         ->name('versi-dokumen.view');
     Route::get('versi-dokumen/{versiDokumen}/download', [VersiDokumenController::class, 'download'])
         ->name('versi-dokumen.download');
+    Route::get('laporan-arsip-dokumen', [LaporanArsipDokumenController::class, 'index'])
+        ->name('laporan-arsip-dokumen.index');
+    Route::get('laporan-arsip-dokumen/export/excel', [LaporanArsipDokumenController::class, 'exportExcel'])
+        ->name('laporan-arsip-dokumen.export.xlsx');
+    Route::get('laporan-arsip-dokumen/export/pdf', [LaporanArsipDokumenController::class, 'exportPdf'])
+        ->name('laporan-arsip-dokumen.export.pdf');
 
     // Preview sementara - hanya untuk development - ongoing.
     Route::post('progress-proyek/{progress_proyek}/dokumentasi', [ProgressProyekController::class, 'storeDocumentation'])

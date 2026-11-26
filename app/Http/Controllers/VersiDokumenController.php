@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\DokumenVerificationStatus;
+use App\Models\ActivityLog;
 use App\Models\DokumenProyek;
 use App\Models\VersiDokumen;
 use App\Services\DokumenFileService;
@@ -93,6 +95,10 @@ class VersiDokumenController extends Controller
                         ->lockForUpdate()
                         ->firstOrFail();
                     $nextVersion = ((int) $lockedDocument->versiDokumen()->max('nomor_versi')) + 1;
+                    $previousStatus = $lockedDocument->status_verifikasi->value;
+                    $lockedDocument->status_verifikasi = DokumenVerificationStatus::Draft;
+                    $lockedDocument->lock_version++;
+                    $lockedDocument->save();
 
                     foreach ($files as $file) {
                         $metadata = $this->validateDocumentFile($file);
@@ -104,7 +110,7 @@ class VersiDokumenController extends Controller
                         }
 
                         $storedPaths[] = $path;
-                        $lockedDocument->versiDokumen()->create([
+                        $version = $lockedDocument->versiDokumen()->create([
                             'nomor_versi' => $nextVersion++,
                             'nama_file' => Str::substr(basename($file->getClientOriginalName()), 0, 255),
                             'nama_file_asli' => Str::substr(basename($file->getClientOriginalName()), 0, 255),
@@ -118,6 +124,23 @@ class VersiDokumenController extends Controller
                             'catatan' => $request->input('catatan'),
                             'user_id' => $request->user()->getKey(),
                         ]);
+
+                        ActivityLog::record(
+                            'document_version_uploaded',
+                            'Versi dokumen baru diunggah.',
+                            $lockedDocument,
+                            properties: [
+                                'project_id' => $lockedDocument->proyek_id,
+                                'category_id' => $lockedDocument->kategori_dokumen_id,
+                                'version_id' => $version->getKey(),
+                                'version_number' => $version->nomor_versi,
+                                'file_name' => $version->nama_file_asli,
+                                'checksum_sha256' => $version->checksum_sha256,
+                                'verification_cycle' => $lockedDocument->verification_cycle,
+                                'before' => ['status_verifikasi' => $previousStatus],
+                                'after' => ['status_verifikasi' => $lockedDocument->status_verifikasi->value],
+                            ]
+                        );
                     }
                 });
 

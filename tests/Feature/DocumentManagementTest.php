@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ActivityLog;
 use App\Models\DokumenProyek;
 use App\Models\JenisPekerjaan;
 use App\Models\KategoriDokumen;
@@ -138,6 +139,7 @@ it('blocks unauthorized document operations and target project changes', functio
         'proyek_id' => $otherProject->id,
         'kategori_dokumen_id' => $this->category->id,
         'nama_dokumen' => 'Percobaan pindah proyek',
+        'lock_version' => $document->lock_version,
     ])->assertForbidden();
 
     $this->assertDatabaseHas('dokumen_proyek', [
@@ -168,6 +170,7 @@ it('allows an assigned member to move a document only to another assigned projec
         'proyek_id' => $targetProject->id,
         'kategori_dokumen_id' => $this->category->id,
         'nama_dokumen' => 'Dokumen Dipindahkan',
+        'lock_version' => $document->lock_version,
     ])->assertRedirect(route('dokumen-proyek.show', $document));
 
     $this->assertDatabaseHas('dokumen_proyek', [
@@ -192,6 +195,7 @@ it('allows admins to create and update categories and documents', function (): v
             'kategori_dokumen_id' => $this->category->id,
             'nama_dokumen' => 'Gambar Struktur Revisi',
             'deskripsi' => 'Metadata diperbarui.',
+            'lock_version' => $document->lock_version,
         ])
         ->assertRedirect(route('dokumen-proyek.show', $document));
 
@@ -199,6 +203,256 @@ it('allows admins to create and update categories and documents', function (): v
         'id' => $document->id,
         'nama_dokumen' => 'Gambar Struktur Revisi',
     ]);
+});
+
+it('runs the review and director decision workflow and resets approval on a new version', function (): void {
+    $document = createDmsDocument();
+    $this->actingAs($this->staff)
+        ->post(route('dokumen-proyek.versi.store', $document), [
+            'files' => [dmsFakeFile('submission.pdf', '%PDF-1.4 submission', 'application/pdf')],
+        ])
+        ->assertRedirect(route('dokumen-proyek.show', $document));
+
+    $supervisor = User::factory()->create([
+        'role_id' => Role::create(['nama_role' => 'Pengawas Lapangan'])->id,
+    ]);
+    ProjectAssignment::create([
+        'project_id' => $this->project->id,
+        'user_id' => $supervisor->id,
+        'role_in_project' => 'Pengawas Lapangan',
+        'assigned_date' => '2026-01-01',
+    ]);
+
+    $document = $document->fresh();
+    $this->actingAs($this->staff)
+        ->post(route('dokumen-proyek.workflow.submit', $document), ['lock_version' => $document->lock_version])
+        ->assertRedirect(route('dokumen-proyek.show', $document));
+
+    $document = $document->fresh();
+    expect($document->status_verifikasi->value)->toBe('pending_review')
+        ->and($document->verification_cycle)->toBe(1);
+
+    $director = User::factory()->create([
+        'role_id' => Role::create(['nama_role' => 'Direktur'])->id,
+    ]);
+    $this->actingAs($director)
+        ->post(route('dokumen-proyek.workflow.finalize', $document), [
+            'lock_version' => $document->lock_version,
+            'decision' => 'approved',
+        ])
+        ->assertStatus(409);
+
+    $this->actingAs($supervisor)
+        ->post(route('dokumen-proyek.workflow.review', $document), [
+            'lock_version' => $document->lock_version,
+            'decision' => 'pass',
+            'note' => 'Dokumen memenuhi pemeriksaan awal.',
+        ])
+        ->assertRedirect(route('dokumen-proyek.show', $document));
+
+    $document = $document->fresh();
+    $this->actingAs($supervisor)
+        ->post(route('dokumen-proyek.workflow.review', $document), [
+            'lock_version' => $document->lock_version,
+            'decision' => 'rejected',
+            'note' => 'Pemeriksaan ulang tidak diizinkan.',
+        ])
+        ->assertForbidden();
+
+    $this->actingAs($director)
+        ->post(route('dokumen-proyek.workflow.finalize', $document), [
+            'lock_version' => $document->lock_version,
+            'decision' => 'approved',
+        ])
+        ->assertRedirect(route('dokumen-proyek.show', $document));
+
+    expect($document->fresh()->status_verifikasi->value)->toBe('approved');
+    $this->assertDatabaseHas('activity_logs', [
+        'subject_type' => 'DokumenProyek',
+        'subject_id' => $document->id,
+        'activity' => 'document_review_pass',
+    ]);
+    $this->assertDatabaseHas('activity_logs', [
+        'subject_type' => 'DokumenProyek',
+        'subject_id' => $document->id,
+        'activity' => 'document_final_approved',
+    ]);
+
+    $this->actingAs($this->staff)
+        ->post(route('dokumen-proyek.versi.store', $document), [
+            'files' => [dmsFakeFile('revision.pdf', '%PDF-1.4 revision', 'application/pdf')],
+        ])
+        ->assertRedirect(route('dokumen-proyek.show', $document));
+
+    expect($document->fresh()->status_verifikasi->value)->toBe('draft')
+        ->and($document->fresh()->versiDokumen)->toHaveCount(2);
+
+    $this->actingAs($this->staff)
+        ->get(route('laporan-arsip-dokumen.index', ['period' => 'revised']))
+        ->assertOk()
+        ->assertSee($document->nomor_dokumen);
+    $this->actingAs($this->staff)
+        ->get(route('laporan-arsip-dokumen.index', ['period' => 'approved']))
+        ->assertOk()
+        ->assertSee($document->nomor_dokumen);
+});
+
+it('requires revision notes and allows a new verification cycle', function (): void {
+    $document = createDmsDocument();
+    $this->actingAs($this->staff)
+        ->post(route('dokumen-proyek.versi.store', $document), [
+            'files' => [dmsFakeFile('submission.pdf', '%PDF-1.4 submission', 'application/pdf')],
+        ])
+        ->assertRedirect(route('dokumen-proyek.show', $document));
+
+    $document = $document->fresh();
+    $this->actingAs($this->staff)
+        ->post(route('dokumen-proyek.workflow.submit', $document), ['lock_version' => $document->lock_version])
+        ->assertRedirect(route('dokumen-proyek.show', $document));
+
+    $supervisor = User::factory()->create([
+        'role_id' => Role::create(['nama_role' => 'Pengawas Lapangan'])->id,
+    ]);
+    ProjectAssignment::create([
+        'project_id' => $this->project->id,
+        'user_id' => $supervisor->id,
+        'role_in_project' => 'Pengawas Lapangan',
+        'assigned_date' => '2026-01-01',
+    ]);
+    $document = $document->fresh();
+
+    $this->actingAs($supervisor)
+        ->post(route('dokumen-proyek.workflow.review', $document), [
+            'lock_version' => $document->lock_version,
+            'decision' => 'revision_required',
+        ])
+        ->assertSessionHasErrors('note');
+
+    $this->actingAs($supervisor)
+        ->post(route('dokumen-proyek.workflow.review', $document), [
+            'lock_version' => $document->lock_version,
+            'decision' => 'revision_required',
+            'note' => 'Mohon lengkapi tanda tangan.',
+        ])
+        ->assertRedirect(route('dokumen-proyek.show', $document));
+
+    $document = $document->fresh();
+    expect($document->status_verifikasi->value)->toBe('revision_required');
+
+    $this->actingAs($this->staff)
+        ->post(route('dokumen-proyek.workflow.submit', $document), ['lock_version' => $document->lock_version])
+        ->assertRedirect(route('dokumen-proyek.show', $document));
+
+    expect($document->fresh()->status_verifikasi->value)->toBe('pending_review')
+        ->and($document->fresh()->verification_cycle)->toBe(2);
+});
+
+it('rejects stale document edits with a conflict response', function (): void {
+    $document = createDmsDocument();
+    DokumenProyek::query()->whereKey($document->getKey())->update(['lock_version' => 1]);
+
+    $this->actingAs($this->admin)
+        ->put(route('dokumen-proyek.update', $document), [
+            'proyek_id' => $this->project->id,
+            'kategori_dokumen_id' => $this->category->id,
+            'nama_dokumen' => 'Perubahan kadaluarsa',
+            'lock_version' => 0,
+        ])
+        ->assertStatus(409);
+
+    $this->assertDatabaseHas('dokumen_proyek', [
+        'id' => $document->id,
+        'nama_dokumen' => 'Gambar Struktur',
+        'lock_version' => 1,
+    ]);
+});
+
+it('keeps existing documents editable when their category is inactive but blocks new use', function (): void {
+    $document = createDmsDocument();
+    KategoriDokumen::query()->whereKey($this->category->getKey())->update(['status' => 'inactive']);
+
+    $this->actingAs($this->admin)
+        ->get(route('dokumen-proyek.edit', $document))
+        ->assertOk()
+        ->assertSee($this->category->nama_kategori);
+
+    $this->actingAs($this->admin)
+        ->put(route('dokumen-proyek.update', $document), [
+            'proyek_id' => $this->project->id,
+            'kategori_dokumen_id' => $this->category->id,
+            'nama_dokumen' => $document->nama_dokumen,
+            'lock_version' => $document->lock_version,
+        ])
+        ->assertRedirect(route('dokumen-proyek.show', $document));
+
+    $this->actingAs($this->admin)
+        ->from(route('dokumen-proyek.create'))
+        ->post(route('dokumen-proyek.store'), [
+            'proyek_id' => $this->project->id,
+            'kategori_dokumen_id' => $this->category->id,
+            'nama_dokumen' => 'Dokumen kategori nonaktif',
+        ])
+        ->assertRedirect(route('dokumen-proyek.create'))
+        ->assertSessionHasErrors('kategori_dokumen_id');
+
+    $this->assertDatabaseCount('dokumen_proyek', 1);
+});
+
+it('prevents categories from being their own or a descendant parent', function (): void {
+    $child = KategoriDokumen::create([
+        'nama_kategori' => 'Subkategori Gambar',
+        'parent_id' => $this->category->id,
+    ]);
+
+    $this->actingAs($this->admin)
+        ->put(route('kategori-dokumen.update', $this->category), [
+            'nama_kategori' => $this->category->nama_kategori,
+            'parent_id' => $this->category->id,
+            'status' => 'active',
+        ])
+        ->assertSessionHasErrors('parent_id');
+
+    $this->actingAs($this->admin)
+        ->put(route('kategori-dokumen.update', $this->category), [
+            'nama_kategori' => $this->category->nama_kategori,
+            'parent_id' => $child->id,
+            'status' => 'active',
+        ])
+        ->assertSessionHasErrors('parent_id');
+
+    $this->assertDatabaseHas('kategori_dokumen', [
+        'id' => $this->category->id,
+        'parent_id' => null,
+    ]);
+});
+
+it('shows only authorized archive records and exports filtered results', function (): void {
+    $document = createDmsDocument();
+    $this->actingAs($this->staff)
+        ->post(route('dokumen-proyek.versi.store', $document), [
+            'files' => [dmsFakeFile('report.pdf', '%PDF-1.4 report', 'application/pdf')],
+        ])
+        ->assertRedirect(route('dokumen-proyek.show', $document));
+
+    $this->actingAs($this->staff)
+        ->get(route('laporan-arsip-dokumen.index', ['status' => 'draft']))
+        ->assertOk()
+        ->assertSee($document->nomor_dokumen)
+        ->assertSee('document version uploaded');
+
+    $this->actingAs($this->outsider)
+        ->get(route('laporan-arsip-dokumen.index'))
+        ->assertOk()
+        ->assertDontSee($document->nomor_dokumen);
+
+    $this->actingAs($this->admin)
+        ->get(route('laporan-arsip-dokumen.export.xlsx', ['status' => 'draft']))
+        ->assertOk()
+        ->assertDownload();
+
+    $this->actingAs($this->admin)
+        ->get(route('laporan-arsip-dokumen.export.pdf', ['status' => 'draft']))
+        ->assertDownload();
 });
 
 it('uploads all supported document formats as sequential private versions', function (): void {
@@ -272,6 +526,24 @@ it('rejects MIME and magic-byte mismatches', function (): void {
         ->assertSessionHasErrors('files');
 
     $this->assertDatabaseCount('versi_dokumen', 0);
+});
+
+it('rolls back a version upload and removes stored files when audit logging fails', function (): void {
+    $document = createDmsDocument();
+    ActivityLog::creating(function (ActivityLog $activity): void {
+        if ($activity->activity === 'document_version_uploaded') {
+            throw new RuntimeException('Simulated audit persistence failure.');
+        }
+    });
+
+    $this->withoutExceptionHandling();
+    expect(fn () => $this->actingAs($this->staff)->post(route('dokumen-proyek.versi.store', $document), [
+        'files' => [dmsFakeFile('rollback.pdf', '%PDF-1.4 rollback', 'application/pdf')],
+    ]))->toThrow(RuntimeException::class, 'Simulated audit persistence failure.');
+
+    $this->assertDatabaseCount('versi_dokumen', 0);
+    $this->assertDatabaseCount('activity_logs', 0);
+    expect(Storage::disk('local')->allFiles('dokumen-proyek/'.$document->id))->toBe([]);
 });
 
 it('supports safe preview and download for authorized users', function (): void {

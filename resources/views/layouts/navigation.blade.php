@@ -7,8 +7,6 @@
                 ['label' => 'Projects', 'route' => 'proyek.index', 'active' => 'proyek.*', 'icon' => 'M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
                 ['label' => 'Documents', 'route' => 'dokumen-proyek.index', 'active' => 'dokumen-proyek.*', 'icon' => 'M6 3h8l4 4v14H6z M14 3v5h5 M9 13h6 M9 17h4'],
                 ['label' => 'Progress', 'route' => 'progress-proyek.index', 'active' => 'progress-proyek.*', 'icon' => 'M3 3v18h18 M7 14l4-4 4 3 6-7'],
-                ['label' => 'Team', 'route' => 'project-assignment.index', 'active' => 'project-assignment.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M17 11h4 M19 9v4'],
-                ['label' => 'Storage', 'route' => 'laporan-dokumentasi.index', 'active' => 'laporan-dokumentasi.*', 'icon' => 'M4 7h16v13H4z M4 7l2-3h5l2 3 M8 11h8'],
                 ['label' => 'Settings', 'route' => 'profile.edit', 'active' => 'profile.*', 'icon' => 'M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.2h-2.5v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H6.5v-2.5h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5V4h2.5v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2v2.5h-.2a1.7 1.7 0 0 0-1.5 1z'],
             ],
         ],
@@ -24,11 +22,13 @@
             'items' => [
                 ['label' => 'Contracts', 'route' => 'contract.index', 'active' => 'contract.*', 'icon' => 'M6 3h9l3 3v15H6z M15 3v4h4 M9 12h6 M9 16h6'],
                 ['label' => 'Project Assignments', 'route' => 'project-assignment.index', 'active' => 'project-assignment.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M17 11h4 M19 9v4'],
+                ['label' => 'Project Tasks', 'route' => 'project-task.index', 'active' => 'project-task.*', 'icon' => 'M9 6h11 M9 12h11 M9 18h11 M4 6h.01 M4 12h.01 M4 18h.01'],
             ],
         ],
         [
             'label' => 'Document Management',
             'items' => [
+                ['label' => 'Laporan Arsip Dokumen', 'route' => 'laporan-arsip-dokumen.index', 'active' => 'laporan-arsip-dokumen.*', 'icon' => 'M4 4h16v16H4z M8 8h8 M8 12h5 M8 16h8'],
                 ['label' => 'Laporan Dokumentasi', 'route' => 'laporan-dokumentasi.index', 'active' => 'laporan-dokumentasi.*', 'icon' => 'M4 4h16v16H4z M8 8h8 M8 12h5 M8 16h8'],
             ],
         ],
@@ -44,8 +44,8 @@
         $navigationGroups[] = [
             'label' => 'Administrasi',
             'items' => [
-                // ['label' => 'Manajemen Pengguna', 'route' => 'users.index', 'active' => 'users.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M20 8v6 M23 11h-6'],
-                // ['label' => 'Pengaturan Sistem', 'route' => 'settings.index', 'active' => 'settings.*', 'icon' => 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.6 2.8-.2-.1a1.7 1.7 0 0 0-1.8.2l-.2.1h-3.2l-.1-.2a1.7 1.7 0 0 0-1.5-1l-.2-.1-1.6-2.8.1-.2a1.7 1.7 0 0 0-.3-1.8l-.1-.2v-3.2l.2-.1a1.7 1.7 0 0 0 1-1.5l.1-.2 2.8-1.6.2.1a1.7 1.7 0 0 0 1.8-.3l.2-.1h3.2l.1.2a1.7 1.7 0 0 0 1.5 1l.2.1 1.6 2.8-.1.2a1.7 1.7 0 0 0 .3 1.8l.1.2v3.2l-.2.1a1.7 1.7 0 0 0-1 1.5z'],
+                ['label' => 'Manajemen Pengguna', 'route' => 'users.index', 'active' => 'users.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M20 8v6 M23 11h-6'],
+                ['label' => 'Pengaturan Sistem', 'route' => 'settings.index', 'active' => 'settings.*', 'icon' => 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.6 2.8-.2-.1a1.7 1.7 0 0 0-1.8.2l-.2.1h-3.2l-.1-.2a1.7 1.7 0 0 0-1.5-1l-.2-.1-1.6-2.8.1-.2a1.7 1.7 0 0 0-.3-1.8l-.1-.2v-3.2l.2-.1a1.7 1.7 0 0 0 1-1.5l.1-.2 2.8-1.6.2.1a1.7 1.7 0 0 0 1.8-.3l.2-.1h3.2l.1.2a1.7 1.7 0 0 0 1.5 1l.2.1 1.6 2.8-.1.2a1.7 1.7 0 0 0 .3 1.8l.1.2v3.2l-.2.1a1.7 1.7 0 0 0-1 1.5z'],
             ],
         ];
     }
@@ -69,7 +69,9 @@
         <a href="{{ route('dashboard') }}" class="flex min-w-0 items-center gap-3" aria-label="ARC Management Dashboard">
             <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#2563EB] text-xs font-bold tracking-wide text-white">ARC</span>
             <span x-show="!sidebarCollapsed" x-cloak class="min-w-0">
-                <span class="block truncate text-sm font-bold tracking-wide">ARC MANAGEMENT</span>
+                <span class="block truncate text-sm font-bold tracking-wide">
+                    {{ \App\Models\SystemConfig::where('config_key', 'app_name')->value('config_value') ?? 'ARC MANAGEMENT' }}
+                </span>
                 <span class="mt-0.5 block truncate text-[10px] uppercase tracking-[0.12em] text-slate-300">Project &amp; Document</span>
             </span>
         </a>
@@ -84,8 +86,11 @@
                 <p x-show="!sidebarCollapsed" x-cloak class="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">{{ $group['label'] }}</p>
                 <div class="space-y-1.5">
                     @foreach ($group['items'] as $item)
-                        @php $isActive = request()->routeIs($item['active']); @endphp
-                        <a href="{{ route($item['route']) }}" @if ($isActive) aria-current="page" @endif :title="sidebarCollapsed ? '{{ $item['label'] }}' : null" class="flex min-h-11 items-center gap-3 rounded-xl border-s-2 px-3 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#93C5FD] {{ $isActive ? 'border-[#60A5FA] bg-[#2563EB] text-white shadow-lg shadow-[#172B4D]/20' : 'border-transparent text-slate-300 hover:bg-white/10 hover:text-white' }}" :class="sidebarCollapsed ? 'justify-center !px-0' : 'justify-start'">
+                        @php
+                            $hasRoute = isset($item['route']) && \Illuminate\Support\Facades\Route::has($item['route']);
+                            $isActive = $hasRoute && request()->routeIs($item['active']);
+                        @endphp
+                        <a href="{{ $hasRoute ? route($item['route']) : '#' }}" @if ($isActive) aria-current="page" @endif :title="sidebarCollapsed ? '{{ $item['label'] }}' : null" class="flex min-h-11 items-center gap-3 rounded-xl border-s-2 px-3 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#93C5FD] {{ $isActive ? 'border-[#60A5FA] bg-[#2563EB] text-white shadow-lg shadow-[#172B4D]/20' : 'border-transparent text-slate-300 hover:bg-white/10 hover:text-white' }}" :class="sidebarCollapsed ? 'justify-center !px-0' : 'justify-start'">
                             <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ $item['icon'] }}" /></svg>
                             <span x-show="!sidebarCollapsed" x-cloak class="truncate">{{ $item['label'] }}</span>
                         </a>
