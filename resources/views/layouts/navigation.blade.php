@@ -1,4 +1,15 @@
 @php
+    $currentRole = Auth::user()?->role?->name;
+    $roleCanView = static function (string $label) use ($currentRole): bool {
+        return match ($label) {
+            'Team', 'Project Assignments' => in_array($currentRole, ['Admin', 'Direktur'], true),
+            'Contracts' => in_array($currentRole, ['Admin', 'Direktur', 'Staff Administrasi'], true),
+            'Laporan Pengawasan' => in_array($currentRole, ['Admin', 'Direktur', 'Pengawas Lapangan'], true),
+            'Clients', 'Jenis Pekerjaan' => in_array($currentRole, ['Admin', 'Direktur', 'Staff Administrasi'], true),
+            default => true,
+        };
+    };
+
     $navigationGroups = [
         [
             'label' => 'Workspace',
@@ -7,8 +18,11 @@
                 ['label' => 'Projects', 'route' => 'proyek.index', 'active' => 'proyek.*', 'icon' => 'M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
                 ['label' => 'Documents', 'route' => 'dokumen-proyek.index', 'active' => 'dokumen-proyek.*', 'icon' => 'M6 3h8l4 4v14H6z M14 3v5h5 M9 13h6 M9 17h4'],
                 ['label' => 'Progress', 'route' => 'progress-proyek.index', 'active' => 'progress-proyek.*', 'icon' => 'M3 3v18h18 M7 14l4-4 4 3 6-7'],
+                ['label' => 'Reports', 'route' => 'reports.index', 'active' => 'reports.*', 'icon' => 'M4 4h16v16H4z M8 8h8 M8 12h5 M8 16h8'],
                 ['label' => 'Team', 'route' => 'project-assignment.index', 'active' => 'project-assignment.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M17 11h4 M19 9v4'],
                 ['label' => 'Storage', 'route' => 'laporan-dokumentasi.index', 'active' => 'laporan-dokumentasi.*', 'icon' => 'M4 7h16v13H4z M4 7l2-3h5l2 3 M8 11h8'],
+                ['label' => 'Foto Dokumentasi', 'route' => 'weekly-documentation.index', 'active' => 'weekly-documentation.*', 'icon' => 'M4 5h16v14H4z M8 14l2-2 2 2 3-4 3 4 M8 9h.01'],
+                ['label' => 'Laporan Pengawasan', 'route' => 'laporan-pengawasan.index', 'active' => 'laporan-pengawasan.*', 'icon' => 'M5 4h14v16H5z M8 8h8 M8 12h8 M8 16h5'],
                 ['label' => 'Settings', 'route' => 'profile.edit', 'active' => 'profile.*', 'icon' => 'M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.2h-2.5v-.2a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H6.5v-2.5h.2a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5V4h2.5v.2a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.2v2.5h-.2a1.7 1.7 0 0 0-1.5 1z'],
             ],
         ],
@@ -108,12 +122,14 @@
 
     <nav class="min-h-0 flex-1 space-y-7 overflow-y-auto px-3 py-6">
         @foreach ($navigationGroups as $group)
+            @php $visibleItems = array_filter($group['items'], fn (array $item): bool => $roleCanView($item['label'])); @endphp
+            @if ($visibleItems !== [])
             <section aria-label="{{ $group['label'] }}">
                 <p x-show="!sidebarCollapsed" x-cloak
                     class="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
                     {{ $group['label'] }}</p>
                 <div class="space-y-1.5">
-                    @foreach ($group['items'] as $item)
+                    @foreach ($visibleItems as $item)
                         @php
                             $hasRoute = isset($item['route']) && \Illuminate\Support\Facades\Route::has($item['route']);
                             $isActive = $hasRoute && request()->routeIs($item['active']);
@@ -125,6 +141,7 @@
                     @endforeach
                 </div>
             </section>
+            @endif
         @endforeach
     </nav>
 
@@ -240,7 +257,15 @@
 
 <nav class="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-[#E3E8EF] bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgba(15,27,45,0.06)] backdrop-blur lg:hidden"
     aria-label="Navigasi mobile">
-    @foreach ([['label' => 'Dashboard', 'route' => 'dashboard', 'active' => 'dashboard', 'icon' => 'M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z'], ['label' => 'Proyek', 'route' => 'proyek.index', 'active' => 'proyek.*', 'icon' => 'M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'], ['label' => 'Klien', 'route' => 'klien.index', 'active' => 'klien.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0-8 0 4 4 0 0 0 0 8 M20 8v6 M23 11h-6'], ['label' => 'Progress', 'route' => 'progress-proyek.index', 'active' => 'progress-proyek.*', 'icon' => 'M3 3v18h18 M7 14l4-4 4 3 6-7']] as $item)
+    @php
+        $mobileNavigationItems = array_values(array_filter([
+            ['label' => 'Dashboard', 'route' => 'dashboard', 'active' => 'dashboard', 'icon' => 'M3 3h7v7H3z M14 3h7v7h-7z M14 14h7v7h-7z M3 14h7v7H3z'],
+            ['label' => 'Proyek', 'route' => 'proyek.index', 'active' => 'proyek.*', 'icon' => 'M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
+            ['label' => 'Clients', 'route' => 'klien.index', 'active' => 'klien.*', 'icon' => 'M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2 M10 11a4 4 0 1 0-8 0 4 4 0 0 0 0 8 M20 8v6 M23 11h-6'],
+            ['label' => 'Progress', 'route' => 'progress-proyek.index', 'active' => 'progress-proyek.*', 'icon' => 'M3 3v18h18 M7 14l4-4 4 3 6-7'],
+        ], fn (array $item): bool => $roleCanView($item['label'])));
+    @endphp
+    @foreach ($mobileNavigationItems as $item)
         @php $isActive = request()->routeIs($item['active']); @endphp
         <a href="{{ route($item['route']) }}" @if ($isActive) aria-current="page" @endif
             class="flex min-h-16 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium {{ $isActive ? 'text-[#0A2342]' : 'text-[#5B6B80]' }}">

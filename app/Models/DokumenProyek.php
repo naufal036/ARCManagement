@@ -15,11 +15,13 @@ class DokumenProyek extends Model
     protected $table = 'dokumen_proyek';
 
     protected $fillable = [
+        'nomor_dokumen',
         'proyek_id',
         'kategori_dokumen_id',
         'progress_proyek_id',
         'nama_dokumen',
         'deskripsi',
+        'drive_url',
     ];
 
     public function proyek(): BelongsTo

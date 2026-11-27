@@ -36,6 +36,24 @@ class DatabaseSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'name' => 'Direktur',
+                'description' => 'Direktur perusahaan',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Staff Administrasi',
+                'description' => 'Staf administrasi',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Pengawas Lapangan',
+                'description' => 'Pengawas lapangan',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
 
         // 3. Buat akun Admin utama

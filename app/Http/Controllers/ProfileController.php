@@ -48,6 +48,9 @@ class ProfileController extends Controller
                 Rule::unique('users', 'email')->ignore($user->id),
             ],
             'phone' => ['nullable', 'string', 'max:20'],
+            'jabatan' => ['nullable', 'string', 'max:100'],
+            'jenis_kelamin' => ['nullable', 'in:Laki-Laki,Perempuan'],
+            'keahlian' => ['nullable', 'string', 'max:2000'],
             'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'current_password' => ['nullable', 'required_with:password', 'current_password'],
             'password' => ['nullable', 'required_with:current_password', 'confirmed', Password::defaults()],
@@ -56,6 +59,11 @@ class ProfileController extends Controller
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->phone = $validated['phone'] ?? null;
+        if (array_key_exists('jabatan', $validated)) {
+            $user->jabatan = $validated['jabatan'];
+            $user->jenis_kelamin = $validated['jenis_kelamin'] ?? null;
+            $user->keahlian = $validated['keahlian'] ?? null;
+        }
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;

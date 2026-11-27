@@ -11,6 +11,7 @@ use App\Models\Proyek;
 use App\Models\User;
 use App\Models\VersiDokumen;
 use App\Services\DokumenFileService;
+use App\Services\DokumenVersionService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -20,7 +21,10 @@ use Illuminate\Support\Facades\Gate;
 
 class DokumenProyekController extends Controller
 {
-    public function __construct(private readonly DokumenFileService $fileService) {}
+    public function __construct(
+        private readonly DokumenFileService $fileService,
+        private readonly DokumenVersionService $versionService,
+    ) {}
 
     public function index(Request $request): View
     {
@@ -93,20 +97,28 @@ class DokumenProyekController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
+            'nomor_dokumen' => ['required', 'string', 'max:100', 'unique:dokumen_proyek,nomor_dokumen'],
             'proyek_id' => ['required', 'exists:proyek,id'],
-            'kategori_dokumen_id' => ['required', 'exists:kategori_dokumen,id'],
-            'progress_proyek_id' => ['nullable', 'exists:progress_proyek,id'],
             'nama_dokumen' => ['required', 'string', 'max:150'],
             'deskripsi' => ['nullable', 'string', 'max:5000'],
+            'drive_url' => ['nullable', 'url', 'max:2048'],
+            'files' => ['required', 'array', 'min:1', 'max:20'],
+            'files.*' => ['required', 'file', 'max:51200'],
         ]);
 
         $project = Proyek::findOrFail($validated['proyek_id']);
         Gate::authorize('create', [DokumenProyek::class, $project]);
-        $this->ensureProgressBelongsToProject($validated['progress_proyek_id'] ?? null, $project->getKey());
+        $files = $request->file('files', []);
+        unset($validated['files']);
 
-        $document = DokumenProyek::create($validated);
+        $document = DB::transaction(function () use ($validated, $files, $request): DokumenProyek {
+            $document = DokumenProyek::create($validated);
+            $this->versionService->upload($document, $files, $request->user());
 
-        return redirect()->route('dokumen-proyek.show', $document)->with('success', 'Dokumen proyek berhasil dibuat.');
+            return $document;
+        });
+
+        return redirect()->route('dokumen-proyek.index')->with('success', 'Dokumen dan file berhasil disimpan.');
     }
 
     public function show(DokumenProyek $dokumenProyek): View
@@ -141,7 +153,7 @@ class DokumenProyekController extends Controller
 
         $validated = $request->validate([
             'proyek_id' => ['required', 'exists:proyek,id'],
-            'kategori_dokumen_id' => ['required', 'exists:kategori_dokumen,id'],
+            'kategori_dokumen_id' => ['nullable', 'exists:kategori_dokumen,id'],
             'progress_proyek_id' => ['nullable', 'exists:progress_proyek,id'],
             'nama_dokumen' => ['required', 'string', 'max:150'],
             'deskripsi' => ['nullable', 'string', 'max:5000'],

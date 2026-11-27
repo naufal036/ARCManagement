@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ProgressDokumentasi;
 use App\Models\ProgressProyek;
+use App\Models\ProjectAssignment;
 use App\Models\Proyek;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -18,11 +19,13 @@ class ProgressProyekController extends Controller
     // Menampilkan daftar laporan progress proyek
     public function index(Request $request)
     {
+        $projects = $this->accessibleProjects();
         $progressProyek = ProgressProyek::with(['user', 'proyek'])
+            ->whereIn('proyek_id', $projects->pluck('id'))
             ->latest('tanggal_laporan')
             ->get();
 
-        $proyeks = Proyek::query()->orderBy('nama_proyek')->get();
+        $proyeks = $projects;
         $selectedProject = $request->filled('project_id')
             ? $proyeks->firstWhere('id', (int) $request->integer('project_id'))
             : $proyeks->first();
@@ -121,7 +124,7 @@ class ProgressProyekController extends Controller
     public function create()
     {
         return view('progress-proyek.create', [
-            'proyeks' => Proyek::orderBy('nama_proyek')->get(),
+            'proyeks' => $this->accessibleProjects(),
         ]);
     }
 
@@ -137,8 +140,10 @@ class ProgressProyekController extends Controller
             'solusi' => 'nullable|string',
             'catatan' => 'nullable|string',
             'rencana_selanjutnya' => 'nullable|string',
+            'drive_url' => ['nullable', 'url', 'max:2048'],
         ]);
 
+        $this->authorizeProject((int) $validated['proyek_id']);
         $validated['user_id'] = auth()->id();
 
         $progress = ProgressProyek::create($validated);
@@ -151,6 +156,7 @@ class ProgressProyekController extends Controller
     // Menampilkan detail laporan progress proyek tertentu
     public function show(ProgressProyek $progressProyek)
     {
+        $this->authorizeProgress($progressProyek);
         $progress = $progressProyek->load([
             'user',
             'proyek',
@@ -162,6 +168,7 @@ class ProgressProyekController extends Controller
 
     public function edit(ProgressProyek $progressProyek)
     {
+        $this->authorizeProgress($progressProyek);
         return view('progress-proyek.edit', [
             'progress' => $progressProyek->load(['user', 'proyek']),
         ]);
@@ -177,8 +184,10 @@ class ProgressProyekController extends Controller
             'solusi' => ['nullable', 'string'],
             'catatan' => ['nullable', 'string'],
             'rencana_selanjutnya' => ['nullable', 'string'],
+            'drive_url' => ['nullable', 'url', 'max:2048'],
         ]);
 
+        $this->authorizeProgress($progressProyek);
         $progressProyek->update($validated);
 
         return redirect()
@@ -188,6 +197,7 @@ class ProgressProyekController extends Controller
 
     public function destroy(ProgressProyek $progressProyek): RedirectResponse
     {
+        $this->authorizeProgress($progressProyek);
         $disk = Storage::disk('local');
         $directory = 'progress-dokumentasi/'.$progressProyek->getKey().'/';
         $paths = $progressProyek->dokumentasi()
@@ -218,13 +228,13 @@ class ProgressProyekController extends Controller
 
     public function storeDocumentation(Request $request, ProgressProyek $progressProyek)
     {
+        $this->authorizeProgress($progressProyek);
         $validated = $request->validate([
             'dokumentasi_file' => [
                 'required',
                 'file',
-                'max:10240',
-                'mimes:jpg,jpeg,png,pdf',
-                'mimetypes:image/jpeg,image/png,application/pdf',
+                'max:51200',
+                'mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,csv,dwg,dxf,ifc,skp,zip,rar',
             ],
             'keterangan' => ['nullable', 'string', 'max:5000'],
         ]);
@@ -263,6 +273,7 @@ class ProgressProyekController extends Controller
         ProgressProyek $progressProyek,
         ProgressDokumentasi $dokumentasi
     ) {
+        $this->authorizeProgress($progressProyek);
         $this->ensureDocumentationBelongsToProgress($progressProyek, $dokumentasi);
 
         $disk = Storage::disk('local');
@@ -275,6 +286,7 @@ class ProgressProyekController extends Controller
         ProgressProyek $progressProyek,
         ProgressDokumentasi $dokumentasi
     ) {
+        $this->authorizeProgress($progressProyek);
         $this->ensureDocumentationBelongsToProgress($progressProyek, $dokumentasi);
 
         $disk = Storage::disk('local');
@@ -297,5 +309,32 @@ class ProgressProyekController extends Controller
             $dokumentasi->progress_proyek_id === $progressProyek->getKey(),
             404
         );
+    }
+
+    private function accessibleProjects()
+    {
+        $user = auth()->user();
+        $role = $user?->role?->name;
+
+        return Proyek::query()
+            ->when(
+                $role !== null && ! in_array($role, ['Admin', 'Direktur'], true),
+                fn ($query) => $query->whereIn(
+                    'id',
+                    ProjectAssignment::query()->where('user_id', $user->id)->select('project_id')
+                )
+            )
+            ->orderBy('nama_proyek')
+            ->get();
+    }
+
+    private function authorizeProject(int $projectId): void
+    {
+        abort_unless($this->accessibleProjects()->contains('id', $projectId), 403, 'Anda tidak memiliki akses ke proyek ini.');
+    }
+
+    private function authorizeProgress(ProgressProyek $progressProyek): void
+    {
+        $this->authorizeProject((int) $progressProyek->proyek_id);
     }
 }

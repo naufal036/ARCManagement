@@ -23,6 +23,32 @@
             </div>
         @endif
 
+        <div x-data="{ profileModalOpen: false }" class="flex justify-end">
+            <button type="button" @click="profileModalOpen = true" class="rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#1D4ED8]">
+                Lengkapi Data Diri
+            </button>
+            <div x-show="profileModalOpen" x-cloak @keydown.escape.window="profileModalOpen = false" class="fixed inset-0 z-50 overflow-y-auto bg-[#0A2342]/60 p-4" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+                <div class="mx-auto mt-10 max-w-2xl rounded-2xl bg-white p-6 shadow-xl">
+                    <div class="flex items-center justify-between gap-4">
+                        <div><p class="text-sm font-medium text-[#2563EB]">Account profile</p><h3 id="profile-modal-title" class="text-xl font-bold text-[#0A2342]">Lengkapi Data Diri</h3></div>
+                        <button type="button" @click="profileModalOpen = false" class="text-2xl text-[#64748B]" aria-label="Tutup">&times;</button>
+                    </div>
+                    <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="mt-5 grid gap-4 sm:grid-cols-2">
+                        @csrf
+                        @method('patch')
+                        <div><label for="modal-name" class="block text-sm font-medium text-gray-700">Nama Lengkap</label><input id="modal-name" name="name" value="{{ old('name', $user->name) }}" required class="mt-1 w-full rounded-xl border-gray-300"></div>
+                        <div><label for="modal-jabatan" class="block text-sm font-medium text-gray-700">Jabatan</label><input id="modal-jabatan" name="jabatan" value="{{ old('jabatan', $user->jabatan) }}" class="mt-1 w-full rounded-xl border-gray-300"></div>
+                        <div><label for="modal-phone" class="block text-sm font-medium text-gray-700">Nomor Telepon</label><input id="modal-phone" name="phone" value="{{ old('phone', $user->phone) }}" inputmode="tel" class="mt-1 w-full rounded-xl border-gray-300"></div>
+                        <div><label for="modal-email" class="block text-sm font-medium text-gray-700">Email</label><input id="modal-email" type="email" name="email" value="{{ old('email', $user->email) }}" required class="mt-1 w-full rounded-xl border-gray-300"></div>
+                        <div><label for="modal-gender" class="block text-sm font-medium text-gray-700">Jenis Kelamin</label><select id="modal-gender" name="jenis_kelamin" class="mt-1 w-full rounded-xl border-gray-300"><option value="">Pilih</option><option @selected(old('jenis_kelamin', $user->jenis_kelamin) === 'Laki-Laki')>Laki-Laki</option><option @selected(old('jenis_kelamin', $user->jenis_kelamin) === 'Perempuan')>Perempuan</option></select></div>
+                        <div><label for="modal-avatar" class="block text-sm font-medium text-gray-700">Foto Profil</label><input id="modal-avatar" type="file" name="avatar" accept="image/jpeg,image/png,image/webp" class="mt-1 w-full rounded-xl border-gray-300 p-2 text-sm"></div>
+                        <div class="sm:col-span-2"><label for="modal-skills" class="block text-sm font-medium text-gray-700">Keahlian</label><textarea id="modal-skills" name="keahlian" rows="3" class="mt-1 w-full rounded-xl border-gray-300">{{ old('keahlian', $user->keahlian) }}</textarea></div>
+                        <div class="flex justify-end gap-3 sm:col-span-2"><button type="button" @click="profileModalOpen = false" class="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-600">Batal</button><button class="rounded-xl bg-[#0A2342] px-4 py-2 text-sm font-semibold text-white">Simpan Data Diri</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <div class="bg-white p-6 rounded-xl shadow-sm border border-[#E3E8EF]">
             <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
                 @csrf

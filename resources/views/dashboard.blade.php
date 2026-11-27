@@ -5,7 +5,7 @@
                 <p class="text-sm font-semibold uppercase tracking-[0.14em] text-[#2563EB]">Workspace overview</p>
                 <h2 class="text-2xl font-bold tracking-tight text-[#172B4D]">Selamat Datang di ARC Management</h2>
             </div>
-            <div class="flex flex-col gap-3 sm:items-end"><p class="text-sm text-[#64748B]">Pantau proyek, dokumen, dan tim dalam satu tempat.</p><a href="{{ route('proyek.index') }}" class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#1D4ED8]">Lihat Projects <span aria-hidden="true">→</span></a></div>
+            <p class="text-sm text-[#64748B]">Pantau proyek, dokumen, dan tim dalam satu tempat.</p>
         </div>
     </x-slot>
 
@@ -45,7 +45,6 @@
                     <h3 class="font-bold text-[#0A2342]">Ringkasan Data Proyek</h3>
                     <p class="mt-1 text-xs text-[#5B6B80]">Jumlah proyek pada setiap status saat ini.</p>
                 </div>
-                <a href="{{ route('proyek.index') }}" class="text-sm font-semibold text-[#0F766E] hover:text-[#0A2342]">Buka daftar proyek</a>
             </div>
             <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                 @forelse ($jumlahProyekPerStatus as $status)

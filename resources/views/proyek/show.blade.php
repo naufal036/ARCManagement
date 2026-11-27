@@ -13,6 +13,13 @@
     </x-slot>
 
     <div class="space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ route('checklist.index', $proyek) }}" class="rounded-xl bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white">Checklist Saya</a>
+            @if ($proyek->project_type === 'Pengawasan')
+                <a href="{{ route('weekly-documentation.index', ['project_id' => $proyek->id]) }}" class="rounded-xl border border-[#D7E0EA] bg-white px-4 py-2 text-sm font-semibold text-[#0A2342]">Foto Dokumentasi</a>
+                <a href="{{ route('laporan-pengawasan.index', ['project_id' => $proyek->id]) }}" class="rounded-xl border border-[#D7E0EA] bg-white px-4 py-2 text-sm font-semibold text-[#0A2342]">Laporan Pengawasan</a>
+            @endif
+        </div>
         <section class="overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-[0_8px_24px_rgba(23,43,77,0.05)]">
             <div class="relative overflow-hidden bg-[#172B4D] px-6 py-7 text-white sm:px-8">
                 @if ($proyek->cover_image_path)
@@ -49,7 +56,7 @@
                 </div>
                 <div>
                     <p class="text-xs uppercase tracking-wide text-[#64748B]">Location</p>
-                    <p class="mt-1 text-sm font-semibold text-[#172B4D]">{{ $proyek->klien?->alamat ?? '—' }}</p>
+                    <p class="mt-1 text-sm font-semibold text-[#172B4D]">{{ $proyek->lokasi ?: ($proyek->klien?->alamat ?? '—') }}</p>
                     <p class="mt-1 text-xs text-[#64748B]">{{ $proyek->klien?->email ?? $proyek->klien?->no_telepon ?? 'Kontak belum diatur' }}</p>
                 </div>
                 <div>
@@ -100,6 +107,11 @@
                     <div><dt class="text-xs font-semibold uppercase tracking-wide text-[#718096]">Target Penyelesaian</dt><dd class="mt-1 text-sm text-[#43546A]">{{ $proyek->tanggal_selesai?->format('d M Y') ?? 'Belum ditentukan' }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase tracking-wide text-[#718096]">Anggaran</dt><dd class="mt-1 font-semibold text-[#0A2342]">{{ $proyek->anggaran !== null ? 'Rp '.number_format((float) $proyek->anggaran, 0, ',', '.') : 'Belum diisi' }}</dd></div>
                     <div><dt class="text-xs font-semibold uppercase tracking-wide text-[#718096]">Status</dt><dd class="mt-1 text-sm font-semibold text-[#0F766E]">{{ $proyek->status }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase tracking-wide text-[#718096]">Jenis Pekerjaan</dt><dd class="mt-1 text-sm font-semibold text-[#0A2342]">{{ $proyek->project_type ?: 'Belum diatur' }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase tracking-wide text-[#718096]">Nama Kegiatan</dt><dd class="mt-1 text-sm text-[#43546A]">{{ $proyek->nama_kegiatan ?: 'Belum diisi' }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase tracking-wide text-[#718096]">Durasi</dt><dd class="mt-1 text-sm text-[#43546A]">{{ $proyek->tanggal_mulai && $proyek->tanggal_selesai ? ($proyek->tanggal_mulai->diffInDays($proyek->tanggal_selesai) + 1).' hari' : ($proyek->waktu_pengerjaan ? $proyek->waktu_pengerjaan.' hari' : 'Belum ditentukan') }}</dd></div>
+                    <div><dt class="text-xs font-semibold uppercase tracking-wide text-[#718096]">Kontrak</dt><dd class="mt-1 text-sm text-[#43546A]">{{ $proyek->nama_kontrak ?: 'Belum diisi' }}{{ $proyek->nilai_kontrak !== null ? ' · Rp '.number_format((float) $proyek->nilai_kontrak, 0, ',', '.') : '' }}</dd></div>
+                    @if ($proyek->drive_url)<div><dt class="text-xs font-semibold uppercase tracking-wide text-[#718096]">Dokumentasi Drive</dt><dd class="mt-1"><a href="{{ $proyek->drive_url }}" target="_blank" rel="noopener" class="text-sm font-semibold text-[#2563EB]">Buka Drive</a></dd></div>@endif
                     <div class="sm:col-span-2"><dt class="text-xs font-semibold uppercase tracking-wide text-[#718096]">Deskripsi</dt><dd class="mt-1 whitespace-pre-line text-sm leading-6 text-[#43546A]">{{ $proyek->deskripsi ?: 'Deskripsi belum diisi.' }}</dd></div>
                 </dl>
             </div>

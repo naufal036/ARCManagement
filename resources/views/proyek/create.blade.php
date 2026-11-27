@@ -15,6 +15,12 @@
                     <p class="mt-1 text-sm text-[#5B6B80]">Kode proyek dapat dikosongkan untuk dibuat secara otomatis.</p>
                 </div>
                 <div class="grid gap-5 md:grid-cols-2">
+                        <div><x-input-label for="nama_kegiatan" value="Nama Kegiatan" /><x-text-input id="nama_kegiatan" name="nama_kegiatan" class="mt-1 block w-full" value="{{ old('nama_kegiatan') }}" /></div>
+                        <div><x-input-label for="instansi" value="Instansi" /><x-text-input id="instansi" name="instansi" class="mt-1 block w-full" value="{{ old('instansi') }}" /></div>
+                        <div><x-input-label for="lokasi" value="Lokasi" /><x-text-input id="lokasi" name="lokasi" class="mt-1 block w-full" value="{{ old('lokasi') }}" /></div>
+                        <div><x-input-label for="project_type" value="Jenis Pekerjaan" /><select id="project_type" name="project_type" required class="mt-1 block w-full rounded-xl border-[#D7DFE8]"><option value="Perencanaan">Perencanaan</option><option value="Pengawasan" @selected(old('project_type') === 'Pengawasan')>Pengawasan</option></select></div>
+                        <div><x-input-label for="waktu_pengerjaan" value="Waktu Pengerjaan (hari)" /><x-text-input id="waktu_pengerjaan" name="waktu_pengerjaan" type="number" min="1" class="mt-1 block w-full" value="{{ old('waktu_pengerjaan') }}" /></div>
+                        <div><x-input-label for="nama_kontrak" value="Nama Kontrak" /><x-text-input id="nama_kontrak" name="nama_kontrak" class="mt-1 block w-full" value="{{ old('nama_kontrak') }}" /></div>
                     <div>
                         <x-input-label for="kode_proyek" value="Kode Proyek (opsional)" />
                         <x-text-input id="kode_proyek" name="kode_proyek" type="text" maxlength="30" placeholder="Biarkan kosong untuk otomatis" class="mt-1 block min-h-11 w-full rounded-xl border-[#D7DFE8] text-sm focus:border-[#14B8A6] focus:ring-[#14B8A6]" value="{{ old('kode_proyek') }}" />
@@ -23,8 +29,8 @@
                     <div>
                         <x-input-label for="status" value="Status Proyek" />
                         <select id="status" name="status" required class="mt-1 block min-h-11 w-full rounded-xl border-[#D7DFE8] text-sm focus:border-[#14B8A6] focus:ring-[#14B8A6]">
-                            @foreach (['Perencanaan', 'Proses', 'Selesai', 'Ditunda', 'Batal'] as $status)
-                                <option value="{{ $status }}" @selected(old('status', 'Perencanaan') === $status)>{{ $status }}</option>
+                            @foreach (['Aktif', 'Selesai', 'Perencanaan', 'Proses', 'Ditunda', 'Batal'] as $status)
+                                <option value="{{ $status }}" @selected(old('status', 'Aktif') === $status)>{{ $status }}</option>
                             @endforeach
                         </select>
                         <x-input-error :messages="$errors->get('status')" class="mt-2" />
@@ -84,6 +90,8 @@
                         <x-text-input id="anggaran" name="anggaran" type="number" min="0" step="0.01" inputmode="decimal" class="mt-1 block min-h-11 w-full rounded-xl border-[#D7DFE8] focus:border-[#14B8A6] focus:ring-[#14B8A6]" value="{{ old('anggaran') }}" />
                         <x-input-error :messages="$errors->get('anggaran')" class="mt-2" />
                     </div>
+                    <div><x-input-label for="nilai_kontrak" value="Nilai Kontrak (Rp)" /><x-text-input id="nilai_kontrak" name="nilai_kontrak" type="number" min="0" step="0.01" class="mt-1 block w-full" value="{{ old('nilai_kontrak') }}" /></div>
+                    <div class="md:col-span-2"><x-input-label for="drive_url" value="Link Google Drive Dokumentasi (opsional)" /><x-text-input id="drive_url" name="drive_url" type="url" class="mt-1 block w-full" value="{{ old('drive_url') }}" /></div>
                     <div>
                         <x-input-label for="cover_image" value="Foto Sampul Proyek (opsional)" />
                         <input id="cover_image" name="cover_image" type="file" accept=".jpg,.jpeg,.png,.webp" class="mt-1 block w-full rounded-xl border border-[#D7DFE8] p-2 text-sm text-[#43546A] file:mr-4 file:rounded-lg file:border-0 file:bg-[#EEF3F8] file:px-4 file:py-2 file:text-xs file:font-semibold file:text-[#0A2342] hover:file:bg-[#E2E8F0]" />

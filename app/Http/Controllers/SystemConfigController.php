@@ -25,6 +25,8 @@ class SystemConfigController extends Controller
 
     public function update(Request $request)
     {
+        abort_unless(in_array($request->user()?->role?->name, ['Admin', 'Direktur'], true), 403, 'Hanya Admin atau Direktur yang dapat mengubah pengaturan sistem.');
+
         $request->validate([
             'app_name' => 'required|string|max:100',
         ]);

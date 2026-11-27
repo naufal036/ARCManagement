@@ -19,6 +19,7 @@ class ProgressProyek extends Model
         'solusi',
         'catatan',
         'rencana_selanjutnya',
+        'drive_url',
     ];
 
     protected function casts(): array

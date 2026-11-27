@@ -156,6 +156,12 @@
                         @enderror
                     </div>
 
+                    <div class="mb-6">
+                        <label for="drive_url" class="block text-sm font-medium mb-2">Link Google Drive (opsional)</label>
+                        <input id="drive_url" type="url" name="drive_url" value="{{ old('drive_url') }}" placeholder="https://drive.google.com/..." class="w-full border-gray-300 rounded-lg">
+                        @error('drive_url') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+                    </div>
+
                     <!-- Tombol -->
                     <div class="flex justify-between">
 

@@ -53,9 +53,9 @@
             </article>
             <article class="flex min-h-36 items-start justify-between gap-4 rounded-2xl border border-[#E3E8EF] border-l-4 border-l-[#14B8A6] bg-white p-5 shadow-[0_8px_24px_rgba(15,27,45,0.05)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,27,45,0.09)]">
                 <div>
-                    <p class="text-sm font-medium text-[#5B6B80]">Proses</p>
-                    <p class="mt-3 text-3xl font-bold tracking-tight text-[#0A2342]">{{ number_format($proyekProses) }}</p>
-                    <p class="mt-1 text-xs text-[#718096]">Proyek yang sedang berjalan</p>
+                    <p class="text-sm font-medium text-[#5B6B80]">Pengawasan</p>
+                    <p class="mt-3 text-3xl font-bold tracking-tight text-[#0A2342]">{{ number_format($proyekPengawasan) }}</p>
+                    <p class="mt-1 text-xs text-[#718096]">Proyek dengan klasifikasi pengawasan</p>
                 </div>
                 <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#E6F4F3] text-[#0F766E]">
                     <svg aria-hidden="true" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">

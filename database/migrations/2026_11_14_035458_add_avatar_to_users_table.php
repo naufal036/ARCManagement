@@ -11,8 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasColumn('users', 'avatar')) {
+            return;
+        }
+
         Schema::table('users', function (Blueprint $table) {
-            $table->string('avatar')->nullable()->after('status');
+            $column = $table->string('avatar')->nullable();
+
+            if (Schema::hasColumn('users', 'status')) {
+                $column->after('status');
+            } elseif (Schema::hasColumn('users', 'phone')) {
+                $column->after('phone');
+            }
         });
     }
 

@@ -108,6 +108,15 @@
                         <p>{{ $progress->rencana_selanjutnya ?? '-' }}</p>
                     </div>
 
+                    <div>
+                        <p class="text-sm text-gray-500">Link Google Drive</p>
+                        @if ($progress->drive_url)
+                            <a href="{{ $progress->drive_url }}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">Buka folder Drive</a>
+                        @else
+                            <p>-</p>
+                        @endif
+                    </div>
+
                     <hr>
 
                     <div>
@@ -126,10 +135,10 @@
                                 <input id="dokumentasi_file"
                                        name="dokumentasi_file"
                                        type="file"
-                                       accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
+                                       accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.csv,.dwg,.dxf,.ifc,.skp,.zip,.rar"
                                        required
                                        class="mt-1 block w-full rounded-lg border-gray-300">
-                                <p class="mt-1 text-xs text-gray-500">Format JPG, PNG, atau PDF; maksimal 10 MB.</p>
+                                <p class="mt-1 text-xs text-gray-500">Format dokumen teknis umum, gambar, atau arsip; maksimal 50 MB.</p>
                             </div>
 
                             <div>

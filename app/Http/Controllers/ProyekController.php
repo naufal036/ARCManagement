@@ -54,15 +54,15 @@ class ProyekController extends Controller
 
         $projectStatistics = Proyek::query()
             ->selectRaw('COUNT(*) as total')
-            ->selectRaw('COUNT(CASE WHEN status = ? THEN 1 END) as perencanaan', ['Perencanaan'])
-            ->selectRaw('COUNT(CASE WHEN status = ? THEN 1 END) as proses', ['Proses'])
+            ->selectRaw('COUNT(CASE WHEN project_type = ? THEN 1 END) as perencanaan', ['Perencanaan'])
+            ->selectRaw('COUNT(CASE WHEN project_type = ? THEN 1 END) as pengawasan', ['Pengawasan'])
             ->first();
 
         return view('proyek.index', [
             'proyek' => $query->latest()->paginate(10)->withQueryString(),
             'totalProyek' => (int) ($projectStatistics->total ?? 0),
             'proyekPerencanaan' => (int) ($projectStatistics->perencanaan ?? 0),
-            'proyekProses' => (int) ($projectStatistics->proses ?? 0),
+            'proyekPengawasan' => (int) ($projectStatistics->pengawasan ?? 0),
             'klien' => Klien::orderBy('nama_klien')->get(['id', 'nama_klien']),
             'jenisPekerjaan' => JenisPekerjaan::orderBy('nama_pekerjaan')->get(['id', 'nama_pekerjaan']),
             'statuses' => Proyek::query()->select('status')->distinct()->orderBy('status')->pluck('status'),
@@ -132,9 +132,11 @@ class ProyekController extends Controller
             'anggaran' => ['nullable', 'numeric', 'min:0', 'decimal:0,2'],
             'deskripsi' => ['nullable', 'string'],
             'status' => ['required', 'string', 'max:30'],
+            'nama_kegiatan' => ['nullable', 'string', 'max:255'], 'instansi' => ['nullable', 'string', 'max:255'], 'lokasi' => ['nullable', 'string', 'max:255'], 'waktu_pengerjaan' => ['nullable', 'integer', 'min:1'], 'nama_kontrak' => ['nullable', 'string', 'max:255'], 'nilai_kontrak' => ['nullable', 'numeric', 'min:0', 'decimal:0,2'], 'project_type' => ['nullable', 'in:Perencanaan,Pengawasan'], 'drive_url' => ['nullable', 'url', 'max:2048'],
             'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
+        $validated['project_type'] ??= 'Pengawasan';
         if (empty($validated['kode_proyek'])) {
             $validated['kode_proyek'] = 'PRJ-'.Str::ulid();
         }
@@ -180,11 +182,13 @@ class ProyekController extends Controller
             'anggaran' => ['nullable', 'numeric', 'min:0', 'decimal:0,2'],
             'deskripsi' => ['nullable', 'string'],
             'status' => ['required', 'string', 'max:30'],
+            'nama_kegiatan' => ['nullable', 'string', 'max:255'], 'instansi' => ['nullable', 'string', 'max:255'], 'lokasi' => ['nullable', 'string', 'max:255'], 'waktu_pengerjaan' => ['nullable', 'integer', 'min:1'], 'nama_kontrak' => ['nullable', 'string', 'max:255'], 'nilai_kontrak' => ['nullable', 'numeric', 'min:0', 'decimal:0,2'], 'project_type' => ['nullable', 'in:Perencanaan,Pengawasan'], 'drive_url' => ['nullable', 'url', 'max:2048'],
             'cover_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         $cover = $request->file('cover_image');
         unset($validated['cover_image']);
+        $validated['project_type'] ??= $proyek->project_type ?: 'Pengawasan';
         $proyek->update($validated);
 
         if ($cover !== null) {
